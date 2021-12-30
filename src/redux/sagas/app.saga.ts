@@ -1,8 +1,7 @@
 import { all, takeEvery } from "redux-saga/effects"
 import { Action } from "redux-actions"
 
-import * as types from "../actions"
-
+import { GENERAL_TYPES as GT } from "../actions/action-types"
 function* setAppLoadingSaga({ payload }: Action<boolean>) {
   try {
     // eslint-disable-next-line no-console
@@ -14,5 +13,5 @@ function* setAppLoadingSaga({ payload }: Action<boolean>) {
 }
 
 export function* settingsSagas() {
-  yield all([takeEvery(types.SET_APP_LOADING, setAppLoadingSaga)])
+  yield all([takeEvery(GT.SET_APP_LOADING, setAppLoadingSaga)])
 }

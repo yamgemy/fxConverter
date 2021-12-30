@@ -6,5 +6,6 @@
   "arrowParens": "always",
   "printWidth": 150,
   "semi": false,
-  "tabWidth": 2
+  "tabWidth": 2,
+  "endOfLine": "auto"
 }

@@ -1,5 +1,6 @@
 import { applyMiddleware, Middleware } from "redux"
 import createSagaMiddleware from "redux-saga"
+import { rootSaga } from "../../sagas"
 
 import { configureLogger } from "./logger"
 
@@ -14,3 +15,5 @@ if (__DEV__) {
 }
 
 export const middleware = applyMiddleware(...middlewareList)
+
+sagaMiddleware.run(rootSaga)
