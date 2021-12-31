@@ -15,5 +15,3 @@ if (__DEV__) {
 }
 
 export const middleware = applyMiddleware(...middlewareList)
-
-sagaMiddleware.run(rootSaga)

@@ -20,6 +20,6 @@ export const getConfiguredStore = () => {
   //but instead when persist rehydrates from previously persisted state, that's like a preloadedState
   const store = createStore(persistedReducer, composeWithDevTools(middleware))
   const persistor = persistStore(store)
-  //moved   sagaMiddleware.run(rootSaga) to middleware index
+  sagaMiddleware.run(rootSaga)
   return { store, persistor }
 }
