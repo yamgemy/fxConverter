@@ -20,16 +20,25 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     resolver: converterSchema,
     shouldFocusError: true,
     mode: 'onSubmit',
-    reValidateMode: 'onBlur',
+    reValidateMode: 'onChange',
     defaultValues: {
       [INPUTSEND]: '',
       [INPUTRECIEVE]: '',
     },
   })
 
+  const {
+    watch,
+    formState: { errors },
+  } = form
+
+  const inputsFilled = watch([INPUTSEND, INPUTRECIEVE]).join('').length > 0 //form.getValues wont work
+
   const onSubmitConvert = useCallback(() => {
-    console.log('on crate transacton pressed')
-  }, [])
+    //TODO still rerenders excessively?
+    const inputValues1: string[] = watch([INPUTSEND, INPUTRECIEVE])
+    console.log('on crate transacton pressed ', inputValues1)
+  }, [watch])
 
   const createOnEdit = React.useCallback((fieldName) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,9 +46,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     }
   }, [])
 
-  const inputValues: string[] = form.watch([INPUTSEND, INPUTRECIEVE]) //this rerender the component always
-
-  console.log('render converter')
+  console.log('render converter', errors)
 
   return (
     <View style={styles.root}>
@@ -47,17 +54,19 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         name={INPUTSEND}
         form={form}
         onEditing={createOnEdit(INPUTSEND)}
+        errors={errors}
       />
       <HookFormInputRightButton
         name={INPUTRECIEVE}
         form={form}
         onEditing={createOnEdit(INPUTRECIEVE)}
+        errors={errors}
       />
       <HookFormButton
         form={form}
         onClick={onSubmitConvert}
         label={'Create Transaction'}
-        inputsFilled={Object.values(inputValues).join('').length > 0}
+        inputsFilled={inputsFilled}
       />
     </View>
   )

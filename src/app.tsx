@@ -1,11 +1,11 @@
-import React from "react"
-import { Provider } from "react-redux"
-import { Provider as PaperProvider } from "react-native-paper"
-import { PersistGate } from "redux-persist/integration/react"
-import { QueryClient, QueryClientProvider } from "react-query"
-import { getConfiguredStore } from "./redux/store"
-import { RNPaperTheme } from "./constants"
-import BottomTabNavigator from "./navigators/BottomTabNavigator"
+import React from 'react'
+import { Provider } from 'react-redux'
+import { Provider as PaperProvider } from 'react-native-paper'
+import { PersistGate } from 'redux-persist/integration/react'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { getConfiguredStore } from './redux/store'
+import { RNPaperTheme } from './constants'
+import BottomTabNavigator from './navigators/BottomTabNavigator'
 
 const queryClient = new QueryClient()
 export const { store, persistor } = getConfiguredStore()

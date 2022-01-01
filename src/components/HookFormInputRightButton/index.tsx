@@ -8,18 +8,19 @@ const HookFormInputRightButton: FC<HookFormInputRightButtonProps> = ({
   name,
   form,
   onEditing,
+  errors,
 }) => {
   const {
     register,
     control,
-    clearErrors,
-    formState: { errors, isValid },
-    reset,
-    setFocus,
-    getValues,
+    // clearErrors,
+    // formState: { errors, isValid },
+    // reset,
+    // setFocus,
+    // getValues,
   } = form
 
-  console.log('renderInput')
+  console.log('renderInput', errors[name] ? true : false)
   return (
     <View style={style.container}>
       <Controller
@@ -41,6 +42,7 @@ const HookFormInputRightButton: FC<HookFormInputRightButtonProps> = ({
               mode={'outlined'}
               style={style.input}
               keyboardType={'numeric'}
+              error={errors[name]}
             />
           )
         }}
@@ -76,6 +78,9 @@ const style = StyleSheet.create({
   },
 })
 
-export default React.memo(HookFormInputRightButton, () => {
+export default React.memo(HookFormInputRightButton, (prev, next) => {
+  if (prev.errors !== next.errors) {
+    return false
+  }
   return true
 })

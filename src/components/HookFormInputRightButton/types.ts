@@ -6,4 +6,5 @@ export interface HookFormInputRightButtonProps {
   name: FieldName<IFormInputsValues>
   form: UseFormReturn<IFormInputsValues>
   onEditing: (e: React.ChangeEvent<HTMLInputElement>) => void //void for now
+  errors: object
 }
