@@ -1,6 +1,6 @@
 {
   "root": true,
-  "extends": ["@react-native-community", "prettier"],
+  "extends": ["plugin:prettier/recommended", "prettier"],
   "plugins": ["@typescript-eslint", "prettier"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

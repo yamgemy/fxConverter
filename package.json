@@ -13,6 +13,7 @@
     "code:check": "tsc --skipLibCheck --noEmit && yarn lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.8.5",
     "@react-native-async-storage/async-storage": "^1.15.14",
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/native": "^6.0.6",

@@ -1,9 +1,14 @@
-import React, { FC } from "react"
-import { StyleSheet, View } from "react-native"
-import { Controller } from "react-hook-form"
-import { Button, TextInput } from "react-native-paper"
+import React, { FC } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { Controller } from 'react-hook-form'
+import { Button, TextInput } from 'react-native-paper'
+import { HookFormInputRightButtonProps } from './types'
 
-const HookFormInputRightButton: FC<any> = ({ name, form, onEdit }) => {
+const HookFormInputRightButton: FC<HookFormInputRightButtonProps> = ({
+  name,
+  form,
+  onEditing,
+}) => {
   const {
     register,
     control,
@@ -13,7 +18,8 @@ const HookFormInputRightButton: FC<any> = ({ name, form, onEdit }) => {
     setFocus,
     getValues,
   } = form
-  const onTyping = () => {}
+
+  console.log('renderInput')
   return (
     <View style={style.container}>
       <Controller
@@ -27,16 +33,18 @@ const HookFormInputRightButton: FC<any> = ({ name, form, onEdit }) => {
           return (
             <TextInput
               {...register(name, {
-                onChange: onTyping,
+                onChange: onEditing,
               })}
+              ref={ref}
+              onChangeText={onChange}
               theme={{ roundness: 0 }}
-              mode={"outlined"}
+              mode={'outlined'}
               style={style.input}
+              keyboardType={'numeric'}
             />
           )
         }}
       />
-
       <Button mode='contained' style={style.rightButton}>
         cunt
       </Button>
@@ -46,26 +54,28 @@ const HookFormInputRightButton: FC<any> = ({ name, form, onEdit }) => {
 
 const style = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    marginHorizontal: "10%",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    marginHorizontal: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
     height: 50,
     marginVertical: 20,
   },
   inputContainer: {
-    overflow: "hidden",
+    overflow: 'hidden',
     borderRadius: 0,
   },
   input: {
-    width: "80%",
+    width: '80%',
     height: 50,
   },
   rightButton: {
     borderRadius: 0,
-    width: "20%",
-    height: "100%",
+    width: '20%',
+    height: '100%',
   },
 })
 
-export default HookFormInputRightButton
+export default React.memo(HookFormInputRightButton, () => {
+  return true
+})
