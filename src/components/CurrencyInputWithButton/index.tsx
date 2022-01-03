@@ -7,7 +7,6 @@ import { CurrencyInputWithButtonProps } from './types'
 //this component is resuable solely as part of a dual on converter screen
 const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
   name,
-  partnerField,
   form,
   onEditing,
   errors,
@@ -58,7 +57,11 @@ const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
         }}
       />
       <Button mode='contained' style={style.rightButton} onPress={currencyBtnPressed}>
-        {isLoading ? <ActivityIndicator size={'small'} color={'#FFF'} /> : currency}
+        {isLoading ? (
+          <ActivityIndicator animating={isLoading} size={'small'} color={'#FFF'} />
+        ) : (
+          currency
+        )}
       </Button>
     </View>
   )

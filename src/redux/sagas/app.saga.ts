@@ -1,14 +1,14 @@
-import { all, takeEvery } from "redux-saga/effects"
-import { Action } from "redux-actions"
+import { all, takeEvery } from 'redux-saga/effects'
+import { Action } from 'redux-actions'
 
-import { GENERAL_TYPES as GT } from "../actions/action-types"
+import { GENERAL_TYPES as GT } from '../actions/action-types'
 function* setAppLoadingSaga({ payload }: Action<boolean>) {
   try {
     // eslint-disable-next-line no-console
-    yield console.log(payload, "something useful to run")
+    yield console.log(payload, 'something useful to run')
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e, "e")
+    console.log(e, 'e')
   }
 }
 

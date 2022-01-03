@@ -21,8 +21,9 @@ const INPUTRECIEVE: FieldName<IFormInputsValues> = 'inputRecieve'
 
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(null)
+  const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(null) //TODO: move to redux
   const [currenciesPicked, setCurrenciesPicked] = useState({
+    //TODO: move to redux
     [INPUTSEND]: 'USD',
     [INPUTRECIEVE]: 'JPY',
   })
@@ -47,10 +48,14 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
 
   const inputsFilled =
     !Object.values(watch([INPUTSEND, INPUTRECIEVE])).includes('') && isEmpty(errors) //form.getValues wont work
-
+  const queryClient = useQueryClient()
   const { data, isLoading = false } = useQuery('queryFX', requestFxRates('USD'), {
-    refetchInterval: 60 * 1000, //this rerenders the component
+    refetchInterval: 60 * 5 * 1000, //this rerenders the component
     initialData: {},
+    onSuccess: (res) => {
+      console.log('res', res)
+      queryClient.setQueryData('queryFx', Object.assign({}, res)) //TODO DOES NOT WORK
+    },
   })
 
   const onClosingModal = () => {
@@ -64,20 +69,34 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     }
   }, [])
 
+  //TODO set new fx value on THE OTHER input, maybe useCallback
   const onItemPicked = (item) => {
-    return () => {
+    return async () => {
       setCurrenciesPicked((prevState) => {
+        //TODO move to saga
         return {
           ...prevState,
           [selectedCurrencyButton]: item,
         }
       })
       setIsModalOpen(false)
+      //fetch if button is send
+      const fromValue = getValues(INPUTRECIEVE)
+      if (selectedCurrencyButton === INPUTSEND) {
+        console.log('hey')
+
+        await queryClient.fetchQuery('queryFX', requestFxRates(item)) //TODO remove after imp saga
+        console.log('after refetch', data)
+
+        changeTargetInputValue(INPUTSEND, getValues(INPUTSEND))
+      } else {
+        changeTargetInputValue(INPUTRECIEVE, getValues(INPUTRECIEVE))
+      }
     }
   }
 
   const onSubmitConvert = useCallback(() => {
-    //TODO still rerenders excessively?
+    //TODO using watch still rerenders excessively?
     const inputValues1: string[] = watch([INPUTSEND, INPUTRECIEVE])
     console.log('on crate transacton pressed ', inputValues1)
   }, [watch])
@@ -90,27 +109,27 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     }
   }
 
-  const changeTargetInputValue = useCallback(
-    (fromField, fromValue) => {
-      if (!fromField || isEmpty(data)) {
-        return
-      }
-      const parsedValue = parseFloat(fromValue)
-      const targetField = fromField === INPUTSEND ? INPUTRECIEVE : INPUTSEND
-      //fromValue = fromValue === '' ? 0 : fromValue ///hard cast to avoid parse error
-      const setValueOptions = { shouldValidate: true }
-      if (fromField === INPUTSEND) {
-        const targetRate = data[currenciesPicked[targetField]]
-        const fxValue = isNaN(parsedValue) ? '' : (targetRate * parsedValue).toString()
-        setValue(targetField, fxValue, setValueOptions)
-      } else if (fromField === INPUTRECIEVE) {
-        const targetRate = data[currenciesPicked[fromField]]
-        const fxValue = isNaN(parsedValue) ? '' : (parsedValue / targetRate).toString()
-        setValue(targetField, fxValue, setValueOptions)
-      }
-    },
-    [data, currenciesPicked, errors, setValue],
-  )
+  const changeTargetInputValue = (fromField, fromValue) => {
+    if (!fromField || isEmpty(data)) {
+      return
+    }
+    const parsedValue = parseFloat(fromValue)
+    const targetField = fromField === INPUTSEND ? INPUTRECIEVE : INPUTSEND
+    //fromValue = fromValue === '' ? 0 : fromValue ///hard cast to avoid parse error
+    const setValueOptions = { shouldValidate: true }
+    if (fromField === INPUTSEND) {
+      const targetRate = data[currenciesPicked[targetField]]
+      console.log('A', data)
+      console.log('A', currenciesPicked[targetField])
+      console.log('A', targetRate + '  ' + parsedValue)
+      const fxValue = isNaN(parsedValue) ? '' : (targetRate * parsedValue).toString()
+      setValue(targetField, fxValue, setValueOptions)
+    } else if (fromField === INPUTRECIEVE) {
+      const targetRate = data[currenciesPicked[fromField]]
+      const fxValue = isNaN(parsedValue) ? '' : (parsedValue / targetRate).toString()
+      setValue(targetField, fxValue, setValueOptions)
+    }
+  }
 
   console.log('render converter & errors: ', errors)
 
@@ -119,7 +138,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
       <View style={styles.root}>
         <CurrencyInputWithButton
           name={INPUTSEND}
-          partnerField={INPUTRECIEVE}
           form={form}
           onEditing={createOnEdit(INPUTSEND)}
           errors={errors}
@@ -130,7 +148,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         />
         <CurrencyInputWithButton
           name={INPUTRECIEVE}
-          partnerField={INPUTSEND}
           form={form}
           onEditing={createOnEdit(INPUTRECIEVE)}
           errors={errors}
