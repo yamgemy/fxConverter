@@ -56,13 +56,16 @@ const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
           )
         }}
       />
-      <Button mode='contained' style={style.rightButton} onPress={currencyBtnPressed}>
+
+      <View style={style.right}>
         {isLoading ? (
-          <ActivityIndicator animating={isLoading} size={'small'} color={'#FFF'} />
+          <ActivityIndicator animating={isLoading} size={'large'} color='#FFFFFF' />
         ) : (
-          currency
+          <Button mode='contained' style={style.button} onPress={currencyBtnPressed}>
+            {currency}
+          </Button>
         )}
-      </Button>
+      </View>
     </View>
   )
 }
@@ -96,11 +99,17 @@ const style = StyleSheet.create({
     width: '80%',
     height: 50,
   },
-  rightButton: {
+  right: {
     borderRadius: 0,
     width: '20%',
     height: '100%',
     justifyContent: 'center',
     alignSelf: 'center',
+  },
+  button: {
+    height: '100%',
+    borderRadius: 0,
+    justifyContent: 'center',
+    marginBottom: -5,
   },
 })
