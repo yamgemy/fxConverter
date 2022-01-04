@@ -5,3 +5,8 @@ export interface InitialSampleScreenProps {
   navigation: NavigationProp<any>
   route: RouteProp<any>
 }
+
+export interface IFormInputsValues {
+  inputSend: string
+  inputRecieve: string
+}

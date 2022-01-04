@@ -4,10 +4,9 @@ import { FX_TYPES as FT } from '../actions/action-types'
 
 const initialState: IFxState = {
   isLoadingFx: false,
-  baseCurrency: 'USD',
   fxRatesData: {},
   currenciesSelections: {
-    inputSend: 'USD',
+    inputSend: 'USD', //this is also the baseCurreny with which to request fxRates
     inputRecieve: 'JPY',
   },
 }

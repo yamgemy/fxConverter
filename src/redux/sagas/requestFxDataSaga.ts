@@ -1,12 +1,4 @@
-import {
-  all,
-  takeEvery,
-  takeLatest,
-  call,
-  put,
-  take,
-  putResolve,
-} from 'redux-saga/effects'
+import { takeLatest, call, put, take, putResolve, select, fork } from 'redux-saga/effects'
 import { Action } from 'redux-actions'
 import { FX_TYPES as FT } from '../actions/action-types'
 import {
@@ -14,23 +6,31 @@ import {
   getRequestFxRatesPromise,
 } from '../../services/endpoints/fxRates'
 import { actionLoadingFxRates, actionOnFxRatesRequested } from '../actions/actions'
-import { IrequestFxRatesPayload } from '../actions/payload-type'
+import { IaCurrencyPicked } from '../actions/payload-type'
+import { INPUTSEND } from '../../screens/Converter/constants'
 
-function* requestFxRatesWorker({ payload }: Action<IrequestFxRatesPayload>) {
-  //TODO add type
-  console.log('at requestFxworker', payload)
-  const { baseCurrency } = payload
+function* currenciesSelectionsWorker({ payload }: Action<IaCurrencyPicked>) {
+  const { targetInput, targetCurrency } = payload
+  // yield take(FT.SET_CURRENCIES_PICKED) //this breaks the flow. nothing calls afterwards
+  if (targetInput === INPUTSEND) {
+    yield call(requestFxRatesWorker, targetCurrency)
+  }
+}
+
+//function* requestFxRatesWorker({ payload }: Action<IrequestFxRatesPayload>) {
+function* requestFxRatesWorker(baseCurrency: string) {
+  //instead of reading state, use the fresh arg instead
+  // const { currenciesSelections } = yield select((state) => state.converterReducer)
   try {
     yield put(actionLoadingFxRates(true))
     const response = yield call(getRequestFxRatesPromise(baseCurrency))
-    console.log('at requestFxRatesWorker ', response)
     yield putResolve(actionOnFxRatesRequested(response.data.data))
     yield put(actionLoadingFxRates(false))
   } catch (e) {
-    console.log(e, 'e')
+    console.log('error at requestFxRatesWorker', e)
   }
 }
 
 export function* requestFxRatesWatcher() {
-  yield takeLatest(FT.REQUEST_FX_RATES, requestFxRatesWorker)
+  yield takeLatest(FT.SET_CURRENCIES_PICKED, currenciesSelectionsWorker)
 }

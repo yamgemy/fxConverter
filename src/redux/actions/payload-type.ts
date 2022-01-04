@@ -2,3 +2,8 @@
 export interface IrequestFxRatesPayload {
   baseCurrency: string
 }
+
+export interface IaCurrencyPicked {
+  targetInput: string
+  targetCurrency: string
+}
