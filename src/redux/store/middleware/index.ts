@@ -1,8 +1,6 @@
-import { applyMiddleware, Middleware } from "redux"
-import createSagaMiddleware from "redux-saga"
-import { rootSaga } from "../../sagas"
-
-import { configureLogger } from "./logger"
+import { applyMiddleware, Middleware } from 'redux'
+import createSagaMiddleware from 'redux-saga'
+import { configureLogger } from './logger'
 
 export const sagaMiddleware = createSagaMiddleware()
 
