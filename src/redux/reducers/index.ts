@@ -1,7 +1,8 @@
 import { combineReducers, Reducer } from 'redux'
 import { Action } from 'redux-actions'
 import { applicationReducer } from './applicationReducer'
-import { IApplicationState } from './stateTypeInterfaces'
+import { converterReducer } from './converterReducer'
+import { IApplicationState, IFxState } from './stateTypeInterfaces'
 // export const initialState = {
 //   //this property shouldn't be named as applicationReducer,
 //   //because you are specifically referring to the state inside of it, which is appLoading
@@ -21,9 +22,13 @@ import { IApplicationState } from './stateTypeInterfaces'
 export interface IAllReducersStates {
   //renamed from InitialState
   applicationReducer: IApplicationState
+  converterReducer: IFxState
   //TODO: add more reducers and their return types
 }
 
 export const rootReducer: Reducer<IAllReducersStates, any> = combineReducers({
   applicationReducer: applicationReducer,
+  converterReducer: converterReducer,
 })
+
+export type RootState = ReturnType<typeof rootReducer>

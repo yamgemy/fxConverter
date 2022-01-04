@@ -10,14 +10,14 @@ export default () => {
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen
-          name="Converter"
+          name='Converter'
           component={ConverterScreen}
           options={{
             headerShown: false,
           }}
         />
         <Tab.Screen
-          name="Transaction"
+          name='Transaction'
           component={TransactionScreen}
           options={{
             headerShown: false,

@@ -1,14 +1,14 @@
-import { createStore, Reducer } from "redux"
-import { composeWithDevTools } from "redux-devtools-extension"
-import { persistStore, persistReducer } from "redux-persist"
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import { createStore, Reducer } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
+import { persistStore, persistReducer } from 'redux-persist'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-import { rootSaga } from "../sagas"
-import { middleware, sagaMiddleware } from "./middleware"
-import { rootReducer } from "../reducers"
+import { rootSagasWatcher } from '../sagas'
+import { middleware, sagaMiddleware } from './middleware'
+import { rootReducer } from '../reducers'
 
 const persistConfig = {
-  key: "fxConverterPersistConfig",
+  key: 'fxConverterPersistConfig',
   storage: AsyncStorage,
 }
 
@@ -20,6 +20,6 @@ export const getConfiguredStore = () => {
   //but instead when persist rehydrates from previously persisted state, that's like a preloadedState
   const store = createStore(persistedReducer, composeWithDevTools(middleware))
   const persistor = persistStore(store)
-  sagaMiddleware.run(rootSaga)
+  sagaMiddleware.run(rootSagasWatcher)
   return { store, persistor }
 }

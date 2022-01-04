@@ -5,3 +5,9 @@ export interface IApplicationState {
 export interface ISomethingState {
   something: Object
 }
+
+export interface IFxState {
+  isLoadingFx: boolean
+  fxRatesData: object
+  currenciesSelections: object
+}
