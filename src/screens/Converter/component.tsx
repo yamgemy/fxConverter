@@ -61,7 +61,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         targetRate = fxRatesData[currenciesSelections[fromField]]
         targetValue = isNaN(parsedValue) ? '' : (parsedValue / targetRate).toString()
       }
-      setValue(targetField, targetValue, { shouldValidate: false })
+      setValue(targetField, targetValue, { shouldValidate: true })
     },
     [fxRatesData, currenciesSelections],
   )
