@@ -12,3 +12,9 @@ export interface IaCurrencyPicked {
   targetInput: string
   targetCurrency: string
 }
+
+export interface IaTransactionEntry {
+  inputSend: object
+  inputRecieve: object
+  time: Date
+}

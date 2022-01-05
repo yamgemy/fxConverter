@@ -12,3 +12,7 @@ export interface IFxState {
   baseCurrency: string
   currenciesSelections: object
 }
+
+export interface ITransactionsState {
+  transactions: {}
+}

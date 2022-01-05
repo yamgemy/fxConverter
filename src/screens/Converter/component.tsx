@@ -14,7 +14,9 @@ import { debounce, DebouncedFunc, isEmpty } from 'lodash'
 import {
   actionOnCurrenciesPicked,
   actionRequestFxRates,
+  actionSubmitTransactionEntry,
 } from '../../redux/actions/actions'
+import { IaTransactionEntry } from '../../redux/actions/payload-type'
 
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
   const dispatch = useDispatch()
@@ -39,13 +41,12 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   const {
     setValue,
     getValues,
+    reset,
     formState: { errors, isDirty },
   } = form
 
-  // const inputsFilled: boolean =
-  //   !Object.values(watch([INPUTSEND, INPUTRECIEVE])).includes('') && isEmpty(errors) //form.getValues wont work
-
-  //not passed to children but wrapped in useCallback to prevent recompute function due to componet rerender
+  //not passed to children but it's actually implicitly done so as it's encapsulated inside 'onEditing'
+  //wrapped in useCallback as well to prevent function being reassigned when converter component rerenders
   const changeTargetInputValue = useCallback(
     (fromField: string, fromValue: string) => {
       if (!fromField || isEmpty(fxRatesData)) {
@@ -100,7 +101,9 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   //usecallback because it's passed to children
   const onSubmitConvert = useCallback(() => {
     const enteredValues = getValues()
-    const result = Object.keys(currenciesSelections).reduce(
+    reset()
+    const transactionEntry: any = Object.keys(currenciesSelections).reduce(
+      //any: lazy typing
       (result, key) => {
         return {
           ...result,
@@ -109,7 +112,8 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
       },
       { time: new Date() },
     )
-    console.log(result)
+    console.log(transactionEntry)
+    dispatch(actionSubmitTransactionEntry(transactionEntry))
   }, [getValues, currenciesSelections])
 
   //usecallback because it's passed to children
