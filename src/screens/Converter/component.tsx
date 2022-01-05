@@ -37,14 +37,13 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   })
 
   const {
-    watch,
     setValue,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = form
 
-  const inputsFilled: boolean =
-    !Object.values(watch([INPUTSEND, INPUTRECIEVE])).includes('') && isEmpty(errors) //form.getValues wont work
+  // const inputsFilled: boolean =
+  //   !Object.values(watch([INPUTSEND, INPUTRECIEVE])).includes('') && isEmpty(errors) //form.getValues wont work
 
   //not passed to children but wrapped in useCallback to prevent recompute function due to componet rerender
   const changeTargetInputValue = useCallback(
@@ -114,13 +113,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   }, [getValues, currenciesSelections])
 
   //usecallback because it's passed to children
-  // const onEditing = useCallback(
-  //   (e: React.ChangeEvent<HTMLInputElement>, fieldName: string): void => {
-  //     changeTargetInputValue(fieldName, e.target.value)
-  //   },
-  //   [currenciesSelections, fxRatesData],
-  // )
-
   const onEditing = useCallback(
     (fieldName) => {
       return (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -159,7 +151,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
           name={INPUTSEND}
           form={form}
           onEditing={onEditing(INPUTSEND)}
-          errors={errors}
           isLoading={isLoadingFx}
           currency={currenciesSelections[INPUTSEND]}
           currencyBtnPressed={currencyBtnPressed(INPUTSEND)}
@@ -169,7 +160,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
           name={INPUTRECIEVE}
           form={form}
           onEditing={onEditing(INPUTRECIEVE)}
-          errors={errors}
           isLoading={isLoadingFx}
           currency={currenciesSelections[INPUTRECIEVE]}
           currencyBtnPressed={currencyBtnPressed(INPUTRECIEVE)}
@@ -179,7 +169,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
           form={form}
           onClick={onSubmitConvert}
           label={'Create Transaction'}
-          inputsFilled={inputsFilled}
+          disabled={!isEmpty(errors) || !isDirty}
         />
       </View>
       <FxCurrenciesModal

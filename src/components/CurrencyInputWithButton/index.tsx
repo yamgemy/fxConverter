@@ -3,15 +3,14 @@ import { StyleSheet, View, ActivityIndicator } from 'react-native'
 import { Controller } from 'react-hook-form'
 import { Button, TextInput } from 'react-native-paper'
 import { CurrencyInputWithButtonProps } from './types'
-
+import { isEmpty } from 'lodash'
 //this component is resuable solely as part of a dual on converter screen
 const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
   name,
   form,
   onEditing,
-  errors,
   isLoading,
-  currency = 'USD',
+  currency = 'USD', //as a fallback
   currencyBtnPressed,
   editable,
 }) => {
@@ -49,7 +48,7 @@ const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
               mode={'outlined'}
               style={style.input}
               keyboardType={'numeric'}
-              error={errors[name]}
+              error={!isEmpty(error)}
               editable={editable}
             />
           )
