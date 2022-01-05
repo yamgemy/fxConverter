@@ -1,6 +1,6 @@
 import React from 'react'
 import { FieldName, UseFormReturn } from 'react-hook-form'
-import { IFormInputsValues } from '../../screens/Converter/component'
+import { IFormInputsValues } from '../../screens/Converter/types'
 
 export interface CurrencyInputWithButtonProps {
   name: FieldName<IFormInputsValues>

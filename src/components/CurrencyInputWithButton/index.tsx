@@ -3,7 +3,7 @@ import { StyleSheet, View, ActivityIndicator } from 'react-native'
 import { Controller } from 'react-hook-form'
 import { Button, TextInput } from 'react-native-paper'
 import { CurrencyInputWithButtonProps } from './types'
-//import { isEmpty } from 'lodash'
+
 //this component is resuable solely as part of a dual on converter screen
 const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
   name,
@@ -25,7 +25,6 @@ const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
     getValues,
   } = form
 
-  //  console.log('renderInput', errors[name] ? true : false)
   console.log('renderInput', isLoading)
 
   return (
@@ -70,17 +69,7 @@ const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
   )
 }
 
-export default React.memo(CurrencyInputWithButton, (prev, next) => {
-  if (
-    prev.errors !== next.errors ||
-    prev.isLoading !== next.isLoading ||
-    prev.currency !== next.currency ||
-    prev.editable !== next.editable
-  ) {
-    return false
-  }
-  return true
-})
+export default React.memo(CurrencyInputWithButton)
 
 const style = StyleSheet.create({
   container: {

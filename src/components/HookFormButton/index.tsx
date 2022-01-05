@@ -25,6 +25,4 @@ const HookFormButton: FC<IHookFormButtonProps> = ({
   )
 }
 
-export default React.memo(HookFormButton, (prev, next) => {
-  return prev.inputsFilled === next.inputsFilled
-})
+export default React.memo(HookFormButton)

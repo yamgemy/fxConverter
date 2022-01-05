@@ -5,6 +5,7 @@ import { FX_TYPES as FT } from '../actions/action-types'
 const initialState: IFxState = {
   isLoadingFx: false,
   fxRatesData: {},
+  baseCurrency: 'USD', //for referrence in debugging only
   currenciesSelections: {
     inputSend: 'USD', //this is also the baseCurreny with which to request fxRates
     inputRecieve: 'JPY',
@@ -23,11 +24,12 @@ export const converterReducer = handleActions<IFxState, any>(
       console.log('converterReducer1', payload)
       return {
         ...state,
-        fxRatesData: payload,
+        fxRatesData: payload.fxData,
+        baseCurrency: payload.baseCurrency,
       }
     },
     [FT.SET_CURRENCIES_PICKED]: (state, { payload }) => {
-      console.log(FT.SET_CURRENCIES_PICKED, payload)
+      console.log('converterReducer1' + FT.SET_CURRENCIES_PICKED, payload)
       return {
         ...state,
         currenciesSelections: {

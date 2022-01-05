@@ -10,6 +10,7 @@ import { rootReducer } from '../reducers'
 const persistConfig = {
   key: 'fxConverterPersistConfig',
   storage: AsyncStorage,
+  blacklist: ['converterReducer'],
 }
 
 //renamed from configureStoe

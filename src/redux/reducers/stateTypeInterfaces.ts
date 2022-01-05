@@ -9,5 +9,6 @@ export interface ISomethingState {
 export interface IFxState {
   isLoadingFx: boolean
   fxRatesData: object
+  baseCurrency: string
   currenciesSelections: object
 }
