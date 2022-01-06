@@ -2,6 +2,7 @@ import { createAction } from 'redux-actions'
 
 import { GENERAL_TYPES as GT, FX_TYPES as FT } from './action-types'
 import {
+  fxDataEntry,
   IaCurrencyPicked,
   IaTransactionEntry,
   IrequestFxRatesPayload,
@@ -17,9 +18,9 @@ export const actionRequestFxRates = createAction<IrequestFxRatesPayload>(
   FT.REQUEST_FX_RATES,
 )
 
-export const actionOnFxRatesRequested = createAction<IresponseFxRatesPayload>(
-  FT.ONSUCCESS_FX_RATES,
-)
+export const actionOnFxRatesRequested = createAction<
+  IresponseFxRatesPayload<fxDataEntry>
+>(FT.ONSUCCESS_FX_RATES)
 
 //this action leads to reuesting fxRates inside requestFxDataSaga.ts
 export const actionOnCurrenciesPicked = createAction<IaCurrencyPicked>(

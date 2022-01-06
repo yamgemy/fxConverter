@@ -50,7 +50,10 @@ const FxCurrenciesModal = ({
         children={
           <View style={sty.modal}>
             <FlatList
-              data={currenciesList}
+              data={
+                currenciesList.length > 0 &&
+                currenciesList.sort((a, b) => a.localeCompare(b))
+              }
               keyExtractor={(i) => i}
               renderItem={renderCurrencyItem}
               ItemSeparatorComponent={renderSeperator}

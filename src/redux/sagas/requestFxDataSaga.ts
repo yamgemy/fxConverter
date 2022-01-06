@@ -20,14 +20,18 @@ import {
   actionRequestFxRates,
   actionSetCurrenciesPicked,
 } from '../actions/actions'
-import { IaCurrencyPicked, IrequestFxRatesPayload } from '../actions/payload-type'
+import {
+  fxDataEntry,
+  IaCurrencyPicked,
+  IrequestFxRatesPayload,
+} from '../actions/payload-type'
 import { INPUTSEND } from '../../screens/Converter/constants'
+import { TIME_LAST_BASECURRENCY_EXPIRES } from '../../constants'
 
 function* currenciesSelectionsWorker({ payload }: Action<IaCurrencyPicked>) {
   const { targetInput, targetCurrency } = payload
-  console.log(payload)
   yield put(actionSetCurrenciesPicked(payload))
-  const { isLoadingFx } = yield select((state) => state.converterReducer) // noeffect .-.
+  const { isLoadingFx } = yield select((state) => state.converterReducer) // noeffect? .-.
   if (targetInput === INPUTSEND && !isLoadingFx) {
     yield call(
       requestFxRatesWorker,
@@ -38,12 +42,22 @@ function* currenciesSelectionsWorker({ payload }: Action<IaCurrencyPicked>) {
 
 function* requestFxRatesWorker({ payload }: Action<IrequestFxRatesPayload>) {
   const { baseCurrency } = payload
+  const { fxRatesData } = yield select((state) => state.converterReducer)
+  const existingFxDataOfBaseCurrency: fxDataEntry = fxRatesData[baseCurrency]
+  if (existingFxDataOfBaseCurrency) {
+    if (
+      new Date().getTime() - existingFxDataOfBaseCurrency.time <
+      TIME_LAST_BASECURRENCY_EXPIRES
+    ) {
+      return //prevents requesting API again if the same base currency was last requested in less than a minute
+    }
+  }
   try {
     yield put(actionLoadingFxRates(true))
     const response = yield call(getRequestFxRatesPromise(payload.baseCurrency))
     yield put(
       actionOnFxRatesRequested({
-        fxData: response.data.data,
+        fxData: { data: response.data.data, time: new Date().getTime() },
         baseCurrency: baseCurrency,
       }),
     )

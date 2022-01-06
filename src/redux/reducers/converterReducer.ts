@@ -21,10 +21,14 @@ export const converterReducer = handleActions<IFxState, any>(
       }
     },
     [FT.ONSUCCESS_FX_RATES]: (state, { payload }) => {
-      console.log('converterReducer1', payload)
+      //this is a structure with the aim to 'normalize' data, in terms of Redux's principles
+      //so that objects can be accessed by key directly instead of using array find /findIndex
       return {
         ...state,
-        fxRatesData: payload.fxData,
+        fxRatesData: {
+          ...state.fxRatesData,
+          [payload.baseCurrency]: payload.fxData,
+        },
         baseCurrency: payload.baseCurrency, //TODO: remove it as it duplicates state
       }
     },

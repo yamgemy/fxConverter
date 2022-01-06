@@ -3,8 +3,13 @@ export interface IrequestFxRatesPayload {
   baseCurrency: string
 }
 
-export interface IresponseFxRatesPayload {
-  fxData: object
+export type fxDataEntry = {
+  data: object
+  time: number //solely to enable checking of last request of the same basecurrency
+}
+
+export interface IresponseFxRatesPayload<fxDataEntry> {
+  fxData: fxDataEntry
   baseCurrency: string
 }
 

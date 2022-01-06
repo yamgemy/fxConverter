@@ -20,11 +20,20 @@ import { useAppSelector, useAppDispatch } from '../../hooks/appReduxHooks'
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
   const dispatch = useAppDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(INPUTSEND) //doesnt seem to be required in other components so put locally
+  //selectedCurrencyButton doesnt seem to be required in other components so put locally
+  // also lessen reducer complexity
+  const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(INPUTSEND)
 
-  const { fxRatesData, isLoadingFx, currenciesSelections } = useAppSelector(
+  const { isLoadingFx, currenciesSelections } = useAppSelector(
     (state: RootState) => state.converterReducer,
   )
+
+  const { fxRatesData } = useAppSelector((state: RootState) => {
+    const { fxRatesData } = state.converterReducer
+    return {
+      fxRatesData: fxRatesData[currenciesSelections[INPUTSEND]]?.data,
+    }
+  })
 
   const form = useForm<IFormInputsValues>({
     resolver: converterSchema,
@@ -40,6 +49,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   const {
     setValue,
     getValues,
+    clearErrors,
     reset,
     formState: { errors, isDirty },
   } = form
@@ -61,7 +71,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         targetRate = fxRatesData[currenciesSelections[fromField]]
         targetValue = isNaN(parsedValue) ? '' : (parsedValue / targetRate).toString()
       }
-      setValue(targetField, targetValue, { shouldValidate: true })
+      setValue(targetField, targetValue, { shouldValidate: true }) //set true will rerender on every keystroke , set false will not remove error in other input even if new value is valid
     },
     [fxRatesData, currenciesSelections],
   )
@@ -117,7 +127,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
       },
       { time: new Date() },
     )
-    console.log(transactionEntry)
     dispatch(actionSubmitTransactionEntry(transactionEntry))
   }, [getValues, currenciesSelections])
 
@@ -126,9 +135,10 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     (fieldName) => {
       return (e: React.ChangeEvent<HTMLInputElement>): void => {
         changeTargetInputValue(fieldName, e.target.value)
+        //TODO: clear errors on the other input
       }
     },
-    [currenciesSelections, fxRatesData],
+    [currenciesSelections, fxRatesData, errors],
   )
   //this useEffect invokes ONLY ONCE after component mounts
   useEffect(() => {
