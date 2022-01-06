@@ -9,21 +9,20 @@ import { converterSchema } from '../../helpers/formValidator'
 import CurrencyInputWithButton from '../../components/CurrencyInputWithButton'
 import HookFormButton from '../../components/HookFormButton'
 import FxCurrenciesModal from '../../components/FxCurrenciesModal'
-import { useDispatch, useSelector } from 'react-redux'
-import { debounce, DebouncedFunc, isEmpty } from 'lodash'
+import { debounce, isEmpty } from 'lodash'
 import {
   actionOnCurrenciesPicked,
   actionRequestFxRates,
   actionSubmitTransactionEntry,
 } from '../../redux/actions/actions'
-import { IaTransactionEntry } from '../../redux/actions/payload-type'
+import { useAppSelector, useAppDispatch } from '../../hooks/appReduxHooks'
 
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(INPUTSEND) //doesnt seem to be required in other components so put locally
 
-  const { fxRatesData, isLoadingFx, currenciesSelections } = useSelector(
+  const { fxRatesData, isLoadingFx, currenciesSelections } = useAppSelector(
     (state: RootState) => state.converterReducer,
   )
 
@@ -68,33 +67,39 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   )
 
   //usecallback because it's passed to children
-  const onClosingModal = useCallback(() => {
-    setIsModalOpen((state) => !state)
+  const toggleModal = useCallback((isOpen) => {
+    return () => {
+      setIsModalOpen(isOpen)
+    }
   }, [])
 
   //usecallback because it's passed to children
   const currencyBtnPressed = useCallback(
     (inputName) =>
       debounce((): void => {
-        setIsModalOpen((state) => !state)
+        toggleModal(true)()
         setSelectedCurrencyButton(inputName)
-      }, 500),
+      }, 300),
     [],
   )
 
   //usecallback because it's passed to children
   const onItemPicked = useCallback(
-    (item) =>
-      debounce(() => {
-        setIsModalOpen(false)
-        dispatch(
-          //this dispatch leads to request fxRate if currency picked at inputSend
-          actionOnCurrenciesPicked({
-            targetInput: selectedCurrencyButton,
-            targetCurrency: item,
-          }),
-        )
-      }, 500),
+    (item) => {
+      return debounce(
+        () => {
+          toggleModal(false)()
+          dispatch(
+            //this dispatch leads to request fxRate if currency picked at inputSend
+            actionOnCurrenciesPicked({
+              targetInput: selectedCurrencyButton,
+              targetCurrency: item,
+            }),
+          )
+        },
+        selectedCurrencyButton === INPUTSEND ? 300 : 0,
+      )
+    },
     [selectedCurrencyButton],
   )
 
@@ -178,7 +183,8 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
       </View>
       <FxCurrenciesModal
         visible={isModalOpen}
-        onClosingModal={onClosingModal}
+        isLoadingFx={isLoadingFx}
+        toggleModal={toggleModal}
         currenciesList={!isEmpty(fxRatesData) && Object.keys(fxRatesData)}
         onItemPicked={onItemPicked}
       />

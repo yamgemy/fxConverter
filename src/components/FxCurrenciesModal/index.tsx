@@ -11,29 +11,37 @@ import Modal from 'react-native-modal'
 
 const FxCurrenciesModal = ({
   visible = false,
-  onClosingModal,
+  toggleModal,
   onItemPicked,
   currenciesList = [],
+  isLoadingFx = false,
 }) => {
   const { height, width } = useWindowDimensions()
 
   const renderCurrencyItem = ({ item }) => {
     return (
-      <TouchableOpacity onPress={onItemPicked(item)}>
-        <View style={sty.currencyItem}>
-          <Text>{item}</Text>
-        </View>
+      <TouchableOpacity
+        disabled={isLoadingFx}
+        onPress={onItemPicked(item)}
+        style={sty.currencyItem}>
+        <Text>{item}</Text>
       </TouchableOpacity>
     )
+  }
+
+  const renderSeperator = () => {
+    return <View style={{ height: 1, backgroundColor: 'gray' }}></View>
   }
   return (
     <View style={sty.container}>
       <Modal
         isVisible={visible}
-        onBackdropPress={onClosingModal}
-        onBackButtonPress={onClosingModal}
-        animationIn='slideInDown'
-        animationOut='slideOutUp'
+        onBackdropPress={toggleModal(false)}
+        onBackButtonPress={toggleModal(false)}
+        animationIn='fadeIn'
+        animationOut='fadeOut'
+        animationInTiming={700}
+        animationOutTiming={300}
         hasBackdrop={true}
         deviceHeight={height}
         deviceWidth={width}
@@ -45,6 +53,7 @@ const FxCurrenciesModal = ({
               data={currenciesList}
               keyExtractor={(i) => i}
               renderItem={renderCurrencyItem}
+              ItemSeparatorComponent={renderSeperator}
             />
           </View>
         }
@@ -62,13 +71,16 @@ const sty = StyleSheet.create({
   modal: {
     height: '100%',
     width: '60%',
+    padding: '3%',
     backgroundColor: 'white',
-    borderRadius: 30,
+    borderRadius: 10,
     alignSelf: 'center',
   },
   currencyItem: {
     padding: 5,
     width: '100%',
+    height: 50,
+    backgroundColor: 'green',
   },
 })
 
