@@ -30,9 +30,12 @@ import { TIME_LAST_BASECURRENCY_EXPIRES } from '../../constants'
 
 function* currenciesSelectionsWorker({ payload }: Action<IaCurrencyPicked>) {
   const { targetInput, targetCurrency } = payload
-  yield put(actionSetCurrenciesPicked(payload))
-  const { isLoadingFx } = yield select((state) => state.converterReducer) // noeffect? .-.
-  if (targetInput === INPUTSEND && !isLoadingFx) {
+  //debounce didn't work :(
+  const { currenciesSelections } = yield select((state) => state.converterReducer)
+  if (currenciesSelections[targetInput] !== targetCurrency) {
+    yield put(actionSetCurrenciesPicked(payload))
+  }
+  if (targetInput === INPUTSEND) {
     yield call(
       requestFxRatesWorker,
       actionRequestFxRates({ baseCurrency: targetCurrency }),

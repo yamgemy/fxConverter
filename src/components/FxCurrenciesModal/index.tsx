@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import {
   View,
   StyleSheet,
@@ -8,36 +8,50 @@ import {
 } from 'react-native'
 import { Text } from 'react-native-paper'
 import Modal from 'react-native-modal'
+import { useAppSelector } from '../../hooks/appReduxHooks'
+import { RootState } from '../../redux/reducers'
+import { isEmpty } from 'lodash'
 
 const FxCurrenciesModal = ({
   visible = false,
-  toggleModal,
+  closeModal,
   onItemPicked,
   currenciesList = [],
   isLoadingFx = false,
 }) => {
   const { height, width } = useWindowDimensions()
+  const { currenciesNames } = useAppSelector(
+    (state: RootState) => state.currenciesNamesReducer,
+  )
+
+  const onCurrencyPressed = useCallback((item) => {
+    return () => {
+      closeModal()
+      onItemPicked(item)()
+    }
+  }, [])
 
   const renderCurrencyItem = ({ item }) => {
     return (
       <TouchableOpacity
         disabled={isLoadingFx}
-        onPress={onItemPicked(item)}
+        onPress={onCurrencyPressed(item)}
         style={sty.currencyItem}>
-        <Text>{item}</Text>
+        <Text style={sty.abbrev}>{item}</Text>
+        {currenciesNames[item] && <Text>{currenciesNames[item]}</Text>}
       </TouchableOpacity>
     )
   }
 
-  const renderSeperator = () => {
-    return <View style={{ height: 1, backgroundColor: 'gray' }}></View>
+  const renderSeparator = () => {
+    return <View style={sty.separator}></View>
   }
   return (
     <View style={sty.container}>
       <Modal
         isVisible={visible}
-        onBackdropPress={toggleModal(false)}
-        onBackButtonPress={toggleModal(false)}
+        onBackdropPress={closeModal}
+        onBackButtonPress={closeModal}
         animationIn='fadeIn'
         animationOut='fadeOut'
         animationInTiming={700}
@@ -56,7 +70,7 @@ const FxCurrenciesModal = ({
               }
               keyExtractor={(i) => i}
               renderItem={renderCurrencyItem}
-              ItemSeparatorComponent={renderSeperator}
+              ItemSeparatorComponent={renderSeparator}
             />
           </View>
         }
@@ -73,7 +87,7 @@ const sty = StyleSheet.create({
   },
   modal: {
     height: '100%',
-    width: '60%',
+    width: '80%',
     padding: '3%',
     backgroundColor: 'white',
     borderRadius: 10,
@@ -83,7 +97,13 @@ const sty = StyleSheet.create({
     padding: 5,
     width: '100%',
     height: 50,
+    flexDirection: 'row',
     backgroundColor: 'green',
+  },
+  separator: { height: 1, backgroundColor: 'gray', width: '100%' },
+  abbrev: {
+    fontWeight: 'bold',
+    marginRight: 10,
   },
 })
 

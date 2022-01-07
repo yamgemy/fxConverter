@@ -2,7 +2,13 @@ import { combineReducers, Reducer } from 'redux'
 import { Action } from 'redux-actions'
 import { applicationReducer } from './applicationReducer'
 import { converterReducer } from './converterReducer'
-import { IApplicationState, IFxState, ITransactionsState } from './stateTypeInterfaces'
+import { currenciesNamesReducer } from './currenciesNamesReducer'
+import {
+  IApplicationState,
+  ICurrenciesNamesState,
+  IFxState,
+  ITransactionsState,
+} from './stateTypeInterfaces'
 import { transactionsReducer } from './transactionsReducer'
 // export const initialState = {
 //   //this property shouldn't be named as applicationReducer,
@@ -25,13 +31,14 @@ export interface IAllReducersStates {
   applicationReducer: IApplicationState
   converterReducer: IFxState
   transactionsReducer: ITransactionsState
-  //TODO: add more reducers and their return types
+  currenciesNamesReducer: ICurrenciesNamesState
 }
 
 export const rootReducer: Reducer<IAllReducersStates, any> = combineReducers({
   applicationReducer: applicationReducer,
   converterReducer: converterReducer,
   transactionsReducer: transactionsReducer,
+  currenciesNamesReducer: currenciesNamesReducer,
 })
 
 export type RootState = ReturnType<typeof rootReducer>

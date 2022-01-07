@@ -12,6 +12,7 @@ import FxCurrenciesModal from '../../components/FxCurrenciesModal'
 import { debounce, isEmpty } from 'lodash'
 import {
   actionOnCurrenciesPicked,
+  actionRequestCurrenciesNames,
   actionRequestFxRates,
   actionSubmitTransactionEntry,
 } from '../../redux/actions/actions'
@@ -71,9 +72,11 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         targetRate = fxRatesData[currenciesSelections[fromField]]
         targetValue = isNaN(parsedValue) ? '' : (parsedValue / targetRate).toString()
       }
-      setValue(targetField, targetValue, { shouldValidate: true }) //set true will rerender on every keystroke , set false will not remove error in other input even if new value is valid
+      setValue(targetField, targetValue, {
+        shouldValidate: isDirty === true && !isEmpty(errors),
+      }) //set true will rerender on every keystroke , set false will not remove error in other input even if new value is valid
     },
-    [fxRatesData, currenciesSelections],
+    [fxRatesData, currenciesSelections, isDirty, errors],
   )
 
   //usecallback because it's passed to children
@@ -98,7 +101,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     (item) => {
       return debounce(
         () => {
-          toggleModal(false)()
           dispatch(
             //this dispatch leads to request fxRate if currency picked at inputSend
             actionOnCurrenciesPicked({
@@ -107,7 +109,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
             }),
           )
         },
-        selectedCurrencyButton === INPUTSEND ? 300 : 0,
+        selectedCurrencyButton === INPUTSEND ? 500 : 0,
       )
     },
     [selectedCurrencyButton],
@@ -143,6 +145,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   //this useEffect invokes ONLY ONCE after component mounts
   useEffect(() => {
     dispatch(actionRequestFxRates({ baseCurrency: currenciesSelections[INPUTSEND] }))
+    dispatch(actionRequestCurrenciesNames())
   }, [])
 
   //0. this useEffect invokes on 2 cases.
@@ -194,7 +197,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
       <FxCurrenciesModal
         visible={isModalOpen}
         isLoadingFx={isLoadingFx}
-        toggleModal={toggleModal}
+        closeModal={toggleModal(false)}
         currenciesList={!isEmpty(fxRatesData) && Object.keys(fxRatesData)}
         onItemPicked={onItemPicked}
       />

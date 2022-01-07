@@ -1,11 +1,16 @@
 import { createAction } from 'redux-actions'
 
-import { GENERAL_TYPES as GT, FX_TYPES as FT } from './action-types'
+import {
+  GENERAL_TYPES as GT,
+  FX_TYPES as FT,
+  CURRENCYNAMES_TYPES as CT,
+} from './action-types'
 import {
   fxDataEntry,
   IaCurrencyPicked,
   IaTransactionEntry,
   IrequestFxRatesPayload,
+  IresponseCurrenciesNamesPayload,
   IresponseFxRatesPayload,
 } from './payload-type'
 
@@ -34,4 +39,10 @@ export const actionSetCurrenciesPicked = createAction<IaCurrencyPicked>(
 
 export const actionSubmitTransactionEntry = createAction<IaTransactionEntry>(
   FT.SUBMIT_TRANSACTION_ENTRY,
+)
+
+export const actionRequestCurrenciesNames = createAction(CT.REQUEST_CURRENCIES_NAMES)
+
+export const actionSetCurrenciesNames = createAction<IresponseCurrenciesNamesPayload>(
+  CT.SET_CURRENCIES_NAMES,
 )

@@ -84,12 +84,12 @@ const style = StyleSheet.create({
     borderRadius: 0,
   },
   input: {
-    width: '80%',
+    width: '78%',
     height: 50,
   },
   right: {
     borderRadius: 0,
-    width: '20%',
+    width: '22%',
     height: '100%',
     justifyContent: 'center',
     alignSelf: 'center',

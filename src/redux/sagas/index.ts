@@ -1,6 +1,7 @@
 import { fork, all } from 'redux-saga/effects'
 
 import { settingsSagasWatcher } from './appLoadingSaga'
+import { requestCurrenciesNamesWatcher } from './currenciesNamesSaga'
 import { requestFxRatesWatcher, currenciesSelectionWatcher } from './requestFxDataSaga'
 
 // export const rootSagasWatcher = function* root() {
@@ -12,5 +13,6 @@ export function* rootSagasWatcher() {
     settingsSagasWatcher(),
     requestFxRatesWatcher(),
     currenciesSelectionWatcher(),
+    requestCurrenciesNamesWatcher(),
   ])
 }

@@ -23,3 +23,7 @@ export interface IaTransactionEntry {
   inputRecieve: object
   time: Date
 }
+
+export interface IresponseCurrenciesNamesPayload {
+  currenciesNames: object
+}
