@@ -4,11 +4,13 @@ import {
   GENERAL_TYPES as GT,
   FX_TYPES as FT,
   CURRENCYNAMES_TYPES as CT,
+  TRANSACTION_TYPES as TT,
 } from './action-types'
 import {
   fxDataEntry,
   IaCurrencyPicked,
   IaTransactionEntry,
+  IremoveTransactionPayload,
   IrequestFxRatesPayload,
   IresponseCurrenciesNamesPayload,
   IresponseFxRatesPayload,
@@ -38,11 +40,15 @@ export const actionSetCurrenciesPicked = createAction<IaCurrencyPicked>(
 )
 
 export const actionSubmitTransactionEntry = createAction<IaTransactionEntry>(
-  FT.SUBMIT_TRANSACTION_ENTRY,
+  TT.SUBMIT_TRANSACTION_ENTRY,
 )
 
 export const actionRequestCurrenciesNames = createAction(CT.REQUEST_CURRENCIES_NAMES)
 
 export const actionSetCurrenciesNames = createAction<IresponseCurrenciesNamesPayload>(
   CT.SET_CURRENCIES_NAMES,
+)
+
+export const actionRemoveTransactionEntry = createAction<IremoveTransactionPayload>(
+  TT.REMOVE_TRANSACTION_ENTRY,
 )

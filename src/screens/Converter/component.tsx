@@ -127,7 +127,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
           [key]: { val: enteredValues[key], currency: currenciesSelections[key] },
         }
       },
-      { time: new Date() },
+      { time: new Date().getTime() },
     )
     dispatch(actionSubmitTransactionEntry(transactionEntry))
   }, [getValues, currenciesSelections])

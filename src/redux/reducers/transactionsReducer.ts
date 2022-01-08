@@ -1,6 +1,6 @@
 import { ITransactionsState } from './stateTypeInterfaces'
 import { handleActions } from 'redux-actions'
-import { FX_TYPES as FT } from '../actions/action-types'
+import { TRANSACTION_TYPES as TT } from '../actions/action-types'
 
 const initialState: ITransactionsState = {
   transactions: {},
@@ -8,14 +8,22 @@ const initialState: ITransactionsState = {
 
 export const transactionsReducer = handleActions<ITransactionsState, any>(
   {
-    [FT.SUBMIT_TRANSACTION_ENTRY]: (state, { payload }) => {
-      console.log('transactionsReducer', payload)
+    [TT.SUBMIT_TRANSACTION_ENTRY]: (state, { payload }) => {
       return {
         ...state,
         transactions: {
           ...state.transactions,
-          [payload.time.getTime().toString()]: payload,
+          [payload.time.toString()]: payload,
         },
+      }
+    },
+    [TT.REMOVE_TRANSACTION_ENTRY]: (state, { payload }) => {
+      const { timeStringKey } = payload
+      const stateCopy = { ...state.transactions }
+      delete stateCopy[timeStringKey]
+      return {
+        ...state,
+        transactions: stateCopy,
       }
     },
   },

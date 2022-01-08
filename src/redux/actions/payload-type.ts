@@ -21,9 +21,13 @@ export interface IaCurrencyPicked {
 export interface IaTransactionEntry {
   inputSend: object
   inputRecieve: object
-  time: Date
+  time: number //convert back to Date object with new Date(time)
 }
 
 export interface IresponseCurrenciesNamesPayload {
   currenciesNames: object
+}
+
+export interface IremoveTransactionPayload {
+  timeStringKey: string
 }
