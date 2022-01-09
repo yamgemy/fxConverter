@@ -6,7 +6,7 @@ import { IaTransactionEntry } from '../../../redux/actions/payload-type'
 import { RootState } from '../../../redux/reducers'
 import { LeftTabProps } from './LeftTabProps'
 
-const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransaction }) => {
+const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransactionId }) => {
   const { transactionsList } = useAppSelector((state: RootState) => {
     return {
       transactionsList: Object.values(
@@ -17,7 +17,7 @@ const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransaction }) => {
 
   const onTransactionEntryPressed = (item) => {
     return () => {
-      setSelectedTransaction(item)
+      setSelectedTransactionId(item.time.toString())
       jumpTo('second')
     }
   }
@@ -40,7 +40,7 @@ const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransaction }) => {
         </TouchableOpacity>
       )
     },
-    [setSelectedTransaction, jumpTo],
+    [setSelectedTransactionId, jumpTo],
   )
 
   return (

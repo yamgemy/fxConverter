@@ -10,6 +10,7 @@ import {
   fxDataEntry,
   IaCurrencyPicked,
   IaTransactionEntry,
+  IdontTransactionPayload,
   IremoveTransactionPayload,
   IrequestFxRatesPayload,
   IresponseCurrenciesNamesPayload,
@@ -49,6 +50,12 @@ export const actionSetCurrenciesNames = createAction<IresponseCurrenciesNamesPay
   CT.SET_CURRENCIES_NAMES,
 )
 
+//not currently through saga
 export const actionRemoveTransactionEntry = createAction<IremoveTransactionPayload>(
   TT.REMOVE_TRANSACTION_ENTRY,
+)
+
+//not currently through saga
+export const actionSetBankTransactionEntry = createAction<IdontTransactionPayload>(
+  TT.DONE_TRANSACTION_ENTRY,
 )

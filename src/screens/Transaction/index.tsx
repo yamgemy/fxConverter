@@ -1,14 +1,12 @@
 import React, { useCallback } from 'react'
 import { useWindowDimensions } from 'react-native'
 import { TabView } from 'react-native-tab-view'
-import { IaTransactionEntry } from '../../redux/actions/payload-type'
 import LeftTab from './LeftTab'
 import RightTab from './RightTab'
 
 const TransactionScreen = () => {
   const layout = useWindowDimensions()
-  const [selectedTransaction, setSelectedTransaction] =
-    React.useState<IaTransactionEntry>()
+  const [selectedTransactionId, setSelectedTransactionId] = React.useState<string>('')
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
     { key: 'first', title: 'First' },
@@ -20,21 +18,24 @@ const TransactionScreen = () => {
       switch (route.key) {
         case 'first':
           return (
-            <LeftTab jumpTo={jumpTo} setSelectedTransaction={setSelectedTransaction} />
+            <LeftTab
+              jumpTo={jumpTo}
+              setSelectedTransactionId={setSelectedTransactionId}
+            />
           )
         case 'second':
           return (
             <RightTab
               jumpTo={jumpTo}
-              selectedTransaction={selectedTransaction}
-              setSelectedTransaction={setSelectedTransaction}
+              selectedTransactionId={selectedTransactionId}
+              setSelectedTransactionId={setSelectedTransactionId}
             />
           )
         default:
           return null
       }
     },
-    [selectedTransaction],
+    [selectedTransactionId],
   )
 
   return (

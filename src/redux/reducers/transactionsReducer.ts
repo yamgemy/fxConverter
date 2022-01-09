@@ -26,6 +26,20 @@ export const transactionsReducer = handleActions<ITransactionsState, any>(
         transactions: stateCopy,
       }
     },
+    [TT.DONE_TRANSACTION_ENTRY]: (state, { payload }) => {
+      const { timeStringKey, recipientBank } = payload
+      return {
+        ...state,
+        transactions: {
+          ...state.transactions,
+          [timeStringKey]: {
+            ...state.transactions[timeStringKey],
+            done: true,
+            recipientBank: recipientBank,
+          },
+        },
+      }
+    },
   },
   initialState,
 )

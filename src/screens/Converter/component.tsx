@@ -17,6 +17,7 @@ import {
   actionSubmitTransactionEntry,
 } from '../../redux/actions/actions'
 import { useAppSelector, useAppDispatch } from '../../hooks/appReduxHooks'
+import { IaTransactionEntry } from '../../redux/actions/payload-type'
 
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
   const dispatch = useAppDispatch()
@@ -119,15 +120,18 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   const onSubmitConvert = useCallback(() => {
     const enteredValues = getValues()
     reset()
-    const transactionEntry: any = Object.keys(currenciesSelections).reduce(
-      //any: lazy typing
-      (result, key) => {
-        return {
-          ...result,
-          [key]: { val: enteredValues[key], currency: currenciesSelections[key] },
-        }
+    const transactionEntry: IaTransactionEntry = Object.keys(currenciesSelections).reduce(
+      (result, key) => ({
+        ...result,
+        [key]: { val: enteredValues[key], currency: currenciesSelections[key] },
+      }),
+      {
+        inputSend: {},
+        inputRecieve: {},
+        time: new Date().getTime(),
+        done: false,
+        recipientBank: '',
       },
-      { time: new Date().getTime() },
     )
     dispatch(actionSubmitTransactionEntry(transactionEntry))
   }, [getValues, currenciesSelections])
