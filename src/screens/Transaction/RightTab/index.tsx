@@ -13,13 +13,17 @@ import { INPUTBANK } from './contants'
 import { bankNameSchema } from '../../../helpers/formValidator'
 import { isEmpty } from 'lodash'
 import { RootState } from '../../../redux/reducers'
-
+import { INPUTRECIEVE, INPUTSEND } from '../../Converter/constants'
+import { getTimeZone } from 'react-native-localize'
+import { labels } from './contants'
 const RightTab: FC<RightTabProps> = ({
   jumpTo,
   selectedTransactionId = '',
   setSelectedTransactionId,
 }) => {
   const dispatch = useAppDispatch()
+  const timeZoneCode = getTimeZone()
+  const [continent, country] = timeZoneCode.split('/')
   const { transactionEntry } = useAppSelector((state: RootState) => {
     return {
       transactionEntry: state.transactionsReducer.transactions[selectedTransactionId],
@@ -54,21 +58,50 @@ const RightTab: FC<RightTabProps> = ({
     reset()
   }, [])
 
-  const sendMoneyPressed = () => {
+  const sendMoneyPressed = useCallback(() => {
     dispatch(
       actionSetBankTransactionEntry({
         timeStringKey: selectedTransactionId,
         recipientBank: getValues(INPUTBANK),
       }),
     )
-  }
+    reset()
+  }, [selectedTransactionId])
 
   console.log('render rightTab', errors)
   return (
     <View style={sty.tabContainer}>
       {transactionEntry && (
         <View>
-          <Text>{JSON.stringify(transactionEntry)}</Text>
+          <View style={sty.infoRow}>
+            <Text style={sty.labelText}>
+              {transactionEntry.done ? labels.done[0] : labels.notDone[0]}
+            </Text>
+            <Text style={sty.infoText}>
+              {transactionEntry[INPUTSEND].val} {transactionEntry[INPUTSEND].currency}
+            </Text>
+          </View>
+
+          <View style={sty.infoRow}>
+            <Text style={sty.labelText}>
+              {transactionEntry.done ? labels.done[1] : labels.notDone[1]}
+            </Text>
+            <Text style={sty.infoText}>
+              {transactionEntry[INPUTRECIEVE].val}{' '}
+              {transactionEntry[INPUTRECIEVE].currency}
+            </Text>
+          </View>
+
+          <View style={sty.infoRow}>
+            <Text style={sty.labelText}>{labels.created}</Text>
+            <Text style={sty.infoText}>
+              {new Date(transactionEntry.time).toLocaleString('uk-UA', {
+                timeZone: timeZoneCode,
+              })}{' '}
+              {country} Time
+            </Text>
+          </View>
+
           {!transactionEntry.done && (
             <Controller
               name={INPUTBANK}
@@ -93,14 +126,20 @@ const RightTab: FC<RightTabProps> = ({
             <View style={sty.buttonsRow}>
               <Button
                 disabled={!isEmpty(errors) || !isDirty || getValues(INPUTBANK) === ''}
-                onPress={sendMoneyPressed}>
+                onPress={sendMoneyPressed}
+                style={sty.button}
+                mode={'contained'}>
                 Send Money
               </Button>
-              <Button onPress={onDeleteEntry}>Delete</Button>
+              <Button mode={'contained'} onPress={onDeleteEntry} style={sty.button}>
+                Delete
+              </Button>
             </View>
           )}
           {transactionEntry.done && transactionEntry.recipientBank !== '' && (
-            <Text>{transactionEntry.recipientBank}</Text>
+            <Text>
+              {labels.bank} {transactionEntry.recipientBank}
+            </Text>
           )}
         </View>
       )}
@@ -113,13 +152,34 @@ export default React.memo(RightTab)
 const sty = StyleSheet.create({
   tabContainer: {
     flex: 1,
-    backgroundColor: '#673ab7',
+    backgroundColor: '#C0C5C1',
+    padding: 15,
   },
   input: {
-    width: '78%',
+    width: '100%',
     height: 50,
   },
   buttonsRow: {
+    width: '100%',
+    height: 50,
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 15,
+  },
+  button: {
+    width: '48%',
+    justifyContent: 'center',
+  },
+  infoRow: {
+    marginVertical: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  labelText: {
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
+  infoText: {
+    fontSize: 17,
   },
 })
