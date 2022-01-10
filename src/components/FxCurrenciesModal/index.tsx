@@ -17,6 +17,7 @@ const FxCurrenciesModal: FC<IFxCurrenciesModalProps> = ({
   visible = false,
   closeModal,
   onItemPicked,
+  selectedCurrencyButton,
   currenciesList = [],
   isLoadingFx = false,
 }) => {
@@ -25,12 +26,15 @@ const FxCurrenciesModal: FC<IFxCurrenciesModalProps> = ({
     (state: RootState) => state.currenciesNamesReducer,
   )
 
-  const onCurrencyPressed = useCallback((item) => {
-    return () => {
-      closeModal()
-      onItemPicked(item)()
-    }
-  }, [])
+  const onCurrencyPressed = useCallback(
+    (item) => {
+      return () => {
+        closeModal()
+        onItemPicked(item, selectedCurrencyButton)()
+      }
+    },
+    [selectedCurrencyButton],
+  )
 
   const renderCurrencyItem = ({ item }) => {
     return (

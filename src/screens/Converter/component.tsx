@@ -98,23 +98,17 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   )
 
   //usecallback because it's passed to children
-  const onItemPicked = useCallback(
-    (item) => {
-      return debounce(
-        () => {
-          dispatch(
-            //this dispatch leads to request fxRate if currency picked at inputSend
-            actionOnCurrenciesPicked({
-              targetInput: selectedCurrencyButton,
-              targetCurrency: item,
-            }),
-          )
-        },
-        selectedCurrencyButton === INPUTSEND ? 500 : 0,
+  const onItemPicked = useCallback((item, fromInputName) => {
+    return debounce(() => {
+      dispatch(
+        //this dispatch leads to request fxRate if currency picked at inputSend
+        actionOnCurrenciesPicked({
+          targetInput: fromInputName,
+          targetCurrency: item,
+        }),
       )
-    },
-    [selectedCurrencyButton],
-  )
+    }, 350)
+  }, [])
 
   //usecallback because it's passed to children
   const onSubmitConvert = useCallback(() => {
@@ -201,6 +195,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         visible={isModalOpen}
         isLoadingFx={isLoadingFx}
         closeModal={toggleModal(false)}
+        selectedCurrencyButton={selectedCurrencyButton}
         currenciesList={!isEmpty(fxRatesData) && Object.keys(fxRatesData)}
         onItemPicked={onItemPicked}
       />
