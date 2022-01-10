@@ -4,11 +4,12 @@ import { useForm } from 'react-hook-form'
 import { styles } from './styles'
 import { RootState } from '../../redux/reducers'
 import { IFormInputsValues, InitialSampleScreenProps } from './types'
-import { INPUTSEND, INPUTRECIEVE } from './constants'
+import { INPUTSEND, INPUTRECIEVE, SNACKBAROPTIONS } from './constants'
 import { converterSchema } from '../../helpers/formValidator'
 import CurrencyInputWithButton from '../../components/CurrencyInputWithButton'
 import HookFormButton from '../../components/HookFormButton'
 import FxCurrenciesModal from '../../components/FxCurrenciesModal'
+import Snackbar from 'react-native-snackbar'
 import { debounce, isEmpty } from 'lodash'
 import {
   actionOnCurrenciesPicked,
@@ -22,8 +23,6 @@ import { IaTransactionEntry } from '../../redux/actions/payload-type'
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
   const dispatch = useAppDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  //selectedCurrencyButton doesnt seem to be required in other components so put locally
-  // also lessen reducer complexity
   const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(INPUTSEND)
 
   const { isLoadingFx, currenciesSelections } = useAppSelector(
@@ -75,7 +74,8 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
       }
       setValue(targetField, targetValue, {
         shouldValidate: isDirty === true && !isEmpty(errors),
-      }) //set true will rerender on every keystroke , set false will not remove error in other input even if new value is valid
+      }) //shouldValidate: set true will rerender on every keystroke;
+      //set false will not remove error in other input even if new value is valid
     },
     [fxRatesData, currenciesSelections, isDirty, errors],
   )
@@ -134,6 +134,8 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
       },
     )
     dispatch(actionSubmitTransactionEntry(transactionEntry))
+    Snackbar.show(SNACKBAROPTIONS)
+    // toggleSnackbar(true)()
   }, [getValues, currenciesSelections])
 
   //usecallback because it's passed to children
@@ -171,33 +173,32 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   console.log('render converter & errors: ', errors)
 
   return (
-    <>
-      <View style={styles.root}>
-        <CurrencyInputWithButton
-          name={INPUTSEND}
-          form={form}
-          onEditing={onEditing(INPUTSEND)}
-          isLoading={isLoadingFx}
-          currency={currenciesSelections[INPUTSEND]}
-          currencyBtnPressed={currencyBtnPressed(INPUTSEND)}
-          editable={!isEmpty(fxRatesData)}
-        />
-        <CurrencyInputWithButton
-          name={INPUTRECIEVE}
-          form={form}
-          onEditing={onEditing(INPUTRECIEVE)}
-          isLoading={isLoadingFx}
-          currency={currenciesSelections[INPUTRECIEVE]}
-          currencyBtnPressed={currencyBtnPressed(INPUTRECIEVE)}
-          editable={!isEmpty(fxRatesData)}
-        />
-        <HookFormButton
-          form={form}
-          onClick={onSubmitConvert}
-          label={'Create Transaction'}
-          disabled={!isEmpty(errors) || !isDirty}
-        />
-      </View>
+    <View style={styles.root}>
+      <CurrencyInputWithButton
+        name={INPUTSEND}
+        form={form}
+        onEditing={onEditing(INPUTSEND)}
+        isLoading={isLoadingFx}
+        currency={currenciesSelections[INPUTSEND]}
+        currencyBtnPressed={currencyBtnPressed(INPUTSEND)}
+        editable={!isEmpty(fxRatesData)}
+      />
+      <CurrencyInputWithButton
+        name={INPUTRECIEVE}
+        form={form}
+        onEditing={onEditing(INPUTRECIEVE)}
+        isLoading={isLoadingFx}
+        currency={currenciesSelections[INPUTRECIEVE]}
+        currencyBtnPressed={currencyBtnPressed(INPUTRECIEVE)}
+        editable={!isEmpty(fxRatesData)}
+      />
+      <HookFormButton
+        form={form}
+        onClick={onSubmitConvert}
+        label={'Create Transaction'}
+        disabled={!isEmpty(errors) || !isDirty}
+      />
+
       <FxCurrenciesModal
         visible={isModalOpen}
         isLoadingFx={isLoadingFx}
@@ -205,7 +206,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         currenciesList={!isEmpty(fxRatesData) && Object.keys(fxRatesData)}
         onItemPicked={onItemPicked}
       />
-    </>
+    </View>
   )
 }
 export default ConverterScreen

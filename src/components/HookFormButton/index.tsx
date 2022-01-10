@@ -12,7 +12,16 @@ const HookFormButton: FC<IHookFormButtonProps> = ({ form, onClick, label, disabl
 
   console.log('renderhookformbutton disabled ', disabled)
   return (
-    <Button disabled={disabled} onPress={handleSubmit(onClick)}>
+    <Button
+      style={{
+        height: 45,
+        marginTop: 28,
+        marginHorizontal: '10%',
+        justifyContent: 'center',
+      }}
+      mode={'contained'}
+      disabled={disabled}
+      onPress={handleSubmit(onClick)}>
       {label}
     </Button>
   )
