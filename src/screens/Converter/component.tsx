@@ -4,32 +4,35 @@ import { useForm } from 'react-hook-form'
 import { styles } from './styles'
 import { RootState } from '../../redux/reducers'
 import { IFormInputsValues, InitialSampleScreenProps } from './types'
-import { INPUTSEND, INPUTRECIEVE } from './constants'
+import { INPUTSEND, INPUTRECIEVE, SNACKBAROPTIONS } from './constants'
 import { converterSchema } from '../../helpers/formValidator'
 import CurrencyInputWithButton from '../../components/CurrencyInputWithButton'
 import HookFormButton from '../../components/HookFormButton'
 import FxCurrenciesModal from '../../components/FxCurrenciesModal'
-import { useDispatch, useSelector } from 'react-redux'
+import Snackbar from 'react-native-snackbar'
 import { debounce, isEmpty } from 'lodash'
-import { actionSetCurrenciesPicked } from '../../redux/actions/actions'
+import {
+  actionOnCurrenciesPicked,
+  actionRequestCurrenciesNames,
+  actionRequestFxRates,
+  actionSubmitTransactionEntry,
+} from '../../redux/actions/actions'
+import { useAppSelector, useAppDispatch } from '../../hooks/appReduxHooks'
+import { IaTransactionEntry } from '../../redux/actions/payload-type'
 
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(INPUTSEND) //TODO: move to redux
+  const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(INPUTSEND)
 
-  const {
-    fxData,
-    isLoading,
-    currenciesSelections = {},
-    initialBaseCurrency,
-  } = useSelector((state: RootState) => {
-    const source = state.converterReducer
+  const { isLoadingFx, currenciesSelections } = useAppSelector(
+    (state: RootState) => state.converterReducer,
+  )
+
+  const { fxRatesData } = useAppSelector((state: RootState) => {
+    const { fxRatesData } = state.converterReducer
     return {
-      fxData: source.fxRatesData,
-      isLoading: source.isLoadingFx,
-      currenciesSelections: source.currenciesSelections,
-      initialBaseCurrency: source.currenciesSelections[INPUTSEND],
+      fxRatesData: fxRatesData[currenciesSelections[INPUTSEND]]?.data,
     }
   })
 
@@ -45,150 +48,165 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   })
 
   const {
-    watch,
     setValue,
     getValues,
-    formState: { errors },
+    clearErrors,
+    reset,
+    formState: { errors, isDirty },
   } = form
 
-  const inputsFilled =
-    !Object.values(watch([INPUTSEND, INPUTRECIEVE])).includes('') && isEmpty(errors) //form.getValues wont work
+  //not passed to children but it's actually implicitly done so as it's encapsulated inside 'onEditing'
+  //wrapped in useCallback as well to prevent function being reassigned when converter component rerenders
+  const changeTargetInputValue = useCallback(
+    (fromField: string, fromValue: string) => {
+      if (!fromField || isEmpty(fxRatesData)) {
+        return
+      }
+      const parsedValue = parseFloat(fromValue)
+      const targetField = fromField === INPUTSEND ? INPUTRECIEVE : INPUTSEND
+      let targetRate: number, targetValue: string
+      if (fromField === INPUTSEND) {
+        targetRate = fxRatesData[currenciesSelections[targetField]]
+        targetValue = isNaN(parsedValue) ? '' : (targetRate * parsedValue).toString()
+      } else if (fromField === INPUTRECIEVE) {
+        targetRate = fxRatesData[currenciesSelections[fromField]]
+        targetValue = isNaN(parsedValue) ? '' : (parsedValue / targetRate).toString()
+      }
+      setValue(targetField, targetValue, {
+        shouldValidate: isDirty === true && !isEmpty(errors),
+      }) //shouldValidate: set true will rerender on every keystroke;
+      //set false will not remove error in other input even if new value is valid
+    },
+    [fxRatesData, currenciesSelections, isDirty, errors],
+  )
 
   //usecallback because it's passed to children
-  const onClosingModal = useCallback(() => {
-    setIsModalOpen(false)
-  }, [])
-  //usecallback because it's passed to children
-  const currencyBtnPressed = useCallback((inputName) => {
+  const toggleModal = useCallback((isOpen) => {
     return () => {
-      setIsModalOpen(true)
-      setSelectedCurrencyButton(inputName)
+      setIsModalOpen(isOpen)
     }
   }, [])
 
   //usecallback because it's passed to children
+  const currencyBtnPressed = useCallback(
+    (inputName) =>
+      debounce((): void => {
+        toggleModal(true)()
+        setSelectedCurrencyButton(inputName)
+      }, 300),
+    [],
+  )
+
+  //usecallback because it's passed to children
   const onItemPicked = useCallback(
     (item) => {
-      return debounce(() => {
-        setIsModalOpen(false)
-        dispatch(
-          //this dispatch leads to fxRates being requested inside requestFxfxDataSaga
-          actionSetCurrenciesPicked({
-            targetInput: selectedCurrencyButton,
-            targetCurrency: item,
-          }),
-        )
-      }, 500)
+      return debounce(
+        () => {
+          dispatch(
+            //this dispatch leads to request fxRate if currency picked at inputSend
+            actionOnCurrenciesPicked({
+              targetInput: selectedCurrencyButton,
+              targetCurrency: item,
+            }),
+          )
+        },
+        selectedCurrencyButton === INPUTSEND ? 500 : 0,
+      )
     },
     [selectedCurrencyButton],
   )
 
   //usecallback because it's passed to children
   const onSubmitConvert = useCallback(() => {
-    //TODO using watch still rerenders excessively?
-    const inputValues1: string[] = watch([INPUTSEND, INPUTRECIEVE])
-    console.log('on crate transacton pressed ', inputValues1)
-  }, [watch])
+    const enteredValues = getValues()
+    reset()
+    const transactionEntry: IaTransactionEntry = Object.keys(currenciesSelections).reduce(
+      (result, key) => ({
+        ...result,
+        [key]: { val: enteredValues[key], currency: currenciesSelections[key] },
+      }),
+      {
+        inputSend: {},
+        inputRecieve: {},
+        time: new Date().getTime(),
+        done: false,
+        recipientBank: '',
+      },
+    )
+    dispatch(actionSubmitTransactionEntry(transactionEntry))
+    Snackbar.show(SNACKBAROPTIONS)
+    // toggleSnackbar(true)()
+  }, [getValues, currenciesSelections])
 
   //usecallback because it's passed to children
-  const createOnEdit = useCallback((fieldName) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      console.log('onEDit', fieldName + ' ' + e.target.value)
-      changeTargetInputValue(fieldName, e.target.value)
-    }
-  }, [])
-
-  const changeTargetInputValue = useCallback(
-    (fromField, fromValue) => {
-      console.log('C3')
-      if (!fromField || isEmpty(fxData)) {
-        return
-      }
-      const parsedValue = parseFloat(fromValue)
-      const targetField = fromField === INPUTSEND ? INPUTRECIEVE : INPUTSEND
-      //fromValue = fromValue === '' ? 0 : fromValue ///hard cast to avoid parse error
-      const setValueOptions = { shouldValidate: false } //we already know for sure it will be a number
-      if (fromField === INPUTSEND) {
-        const targetRate = fxData[currenciesSelections[targetField]]
-        console.log('A', fxData) //fxData not listening to newest
-        console.log('A', currenciesSelections[targetField]) //currenciesSelections didnt update
-        console.log('A', targetRate + '  ' + parsedValue)
-        const fxValue = isNaN(parsedValue) ? '' : (targetRate * parsedValue).toString()
-        setValue(targetField, fxValue, setValueOptions)
-      } else if (fromField === INPUTRECIEVE) {
-        const targetCurrency = currenciesSelections[fromField]
-        console.log(targetCurrency)
-        const targetRate = fxData[targetCurrency]
-        console.log('B', targetRate)
-        const fxValue = isNaN(parsedValue) ? '' : (parsedValue / targetRate).toString()
-        console.log('B', fxValue)
-        setValue(targetField, fxValue, setValueOptions)
+  const onEditing = useCallback(
+    (fieldName) => {
+      return (e: React.ChangeEvent<HTMLInputElement>): void => {
+        changeTargetInputValue(fieldName, e.target.value)
+        //TODO: clear errors on the other input
       }
     },
-    [fxData, currenciesSelections],
+    [currenciesSelections, fxRatesData, errors],
   )
-
   //this useEffect invokes ONLY ONCE after component mounts
-  //This is the entry point for requesting fxrates
   useEffect(() => {
-    dispatch(
-      actionSetCurrenciesPicked({
-        targetInput: selectedCurrencyButton,
-        targetCurrency: initialBaseCurrency,
-      }),
-    )
+    dispatch(actionRequestFxRates({ baseCurrency: currenciesSelections[INPUTSEND] }))
+    dispatch(actionRequestCurrenciesNames())
   }, [])
 
-  //1. selectedCurrencyButton state set, modal opens
-  //2 pick a currency -> dispatch currenciesSelections
-  //3 inside saga wait for currenciesSelections set then if it's from inputsend, requesFxRates
-  //4 on fxData changed, then changeTargetInputValue
+  //0. this useEffect invokes on 2 cases.
+  //1. after the initial actionRequestFxRates dispatch and fxData updated,
+  //2. after currenciesSelections changed AND ONLY if it's from inputSend, actionRequestFxRates is also invoked
   useEffect(() => {
-    console.log('E1')
-    if (!isEmpty(fxData)) {
+    if (!isEmpty(fxRatesData)) {
       changeTargetInputValue(selectedCurrencyButton, getValues(selectedCurrencyButton))
     }
-  }, [fxData])
+  }, [fxRatesData])
+
+  //picking currency at inputRecieve DOES NOT request fxRatesData, change inputSend value immediately
+  useEffect(() => {
+    if (selectedCurrencyButton === INPUTRECIEVE) {
+      changeTargetInputValue(selectedCurrencyButton, getValues(selectedCurrencyButton))
+    }
+  }, [currenciesSelections])
 
   console.log('render converter & errors: ', errors)
 
   return (
-    <>
-      <View style={styles.root}>
-        <CurrencyInputWithButton
-          name={INPUTSEND}
-          form={form}
-          onEditing={createOnEdit(INPUTSEND)}
-          errors={errors}
-          isLoading={isLoading}
-          currency={currenciesSelections[INPUTSEND]}
-          currencyBtnPressed={currencyBtnPressed(INPUTSEND)}
-          editable={!isEmpty(fxData)}
-        />
-        <CurrencyInputWithButton
-          name={INPUTRECIEVE}
-          form={form}
-          onEditing={createOnEdit(INPUTRECIEVE)}
-          errors={errors}
-          isLoading={isLoading}
-          currency={currenciesSelections[INPUTRECIEVE]}
-          currencyBtnPressed={currencyBtnPressed(INPUTRECIEVE)}
-          editable={!isEmpty(fxData)}
-        />
-        <HookFormButton
-          form={form}
-          onClick={onSubmitConvert}
-          label={'Create Transaction'}
-          inputsFilled={inputsFilled}
-        />
-      </View>
+    <View style={styles.root}>
+      <CurrencyInputWithButton
+        name={INPUTSEND}
+        form={form}
+        onEditing={onEditing(INPUTSEND)}
+        isLoading={isLoadingFx}
+        currency={currenciesSelections[INPUTSEND]}
+        currencyBtnPressed={currencyBtnPressed(INPUTSEND)}
+        editable={!isEmpty(fxRatesData)}
+      />
+      <CurrencyInputWithButton
+        name={INPUTRECIEVE}
+        form={form}
+        onEditing={onEditing(INPUTRECIEVE)}
+        isLoading={isLoadingFx}
+        currency={currenciesSelections[INPUTRECIEVE]}
+        currencyBtnPressed={currencyBtnPressed(INPUTRECIEVE)}
+        editable={!isEmpty(fxRatesData)}
+      />
+      <HookFormButton
+        form={form}
+        onClick={onSubmitConvert}
+        label={'Create Transaction'}
+        disabled={!isEmpty(errors) || !isDirty}
+      />
+
       <FxCurrenciesModal
         visible={isModalOpen}
-        onClosingModal={onClosingModal}
-        currenciesList={!isEmpty(fxData) && Object.keys(fxData)}
+        isLoadingFx={isLoadingFx}
+        closeModal={toggleModal(false)}
+        currenciesList={!isEmpty(fxRatesData) && Object.keys(fxRatesData)}
         onItemPicked={onItemPicked}
       />
-    </>
+    </View>
   )
 }
 export default ConverterScreen

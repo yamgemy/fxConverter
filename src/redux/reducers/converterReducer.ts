@@ -5,6 +5,7 @@ import { FX_TYPES as FT } from '../actions/action-types'
 const initialState: IFxState = {
   isLoadingFx: false,
   fxRatesData: {},
+  baseCurrency: 'USD', //for referrence in debugging only
   currenciesSelections: {
     inputSend: 'USD', //this is also the baseCurreny with which to request fxRates
     inputRecieve: 'JPY',
@@ -20,14 +21,19 @@ export const converterReducer = handleActions<IFxState, any>(
       }
     },
     [FT.ONSUCCESS_FX_RATES]: (state, { payload }) => {
-      console.log('converterReducer1', payload)
+      //this is a structure with the aim to 'normalize' data, in terms of Redux's principles
+      //so that objects can be accessed by key directly instead of using array find /findIndex
       return {
         ...state,
-        fxRatesData: payload,
+        fxRatesData: {
+          ...state.fxRatesData,
+          [payload.baseCurrency]: payload.fxData,
+        },
+        baseCurrency: payload.baseCurrency, //TODO: remove it as it duplicates state
       }
     },
     [FT.SET_CURRENCIES_PICKED]: (state, { payload }) => {
-      console.log(FT.SET_CURRENCIES_PICKED, payload)
+      console.log('converterReducer1' + FT.SET_CURRENCIES_PICKED, payload)
       return {
         ...state,
         currenciesSelections: {

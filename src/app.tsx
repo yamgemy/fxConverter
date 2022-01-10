@@ -8,6 +8,7 @@ import { RNPaperTheme } from './constants'
 import BottomTabNavigator from './navigators/BottomTabNavigator'
 
 const queryClient = new QueryClient()
+
 export const { store, persistor } = getConfiguredStore()
 
 export default () => (

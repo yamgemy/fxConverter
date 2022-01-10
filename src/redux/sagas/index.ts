@@ -1,12 +1,18 @@
 import { fork, all } from 'redux-saga/effects'
 
 import { settingsSagasWatcher } from './appLoadingSaga'
-import { requestFxRatesWatcher } from './requestFxDataSaga'
+import { requestCurrenciesNamesWatcher } from './currenciesNamesSaga'
+import { requestFxRatesWatcher, currenciesSelectionWatcher } from './requestFxDataSaga'
 
 // export const rootSagasWatcher = function* root() {
 //   yield fork(settingsSagasWatcher)
 // }
 
 export function* rootSagasWatcher() {
-  yield all([settingsSagasWatcher(), requestFxRatesWatcher()])
+  yield all([
+    settingsSagasWatcher(),
+    requestFxRatesWatcher(),
+    currenciesSelectionWatcher(),
+    requestCurrenciesNamesWatcher(),
+  ])
 }
