@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { Text, Button, TextInput } from 'react-native-paper'
+import { Text, Button, TextInput, IconButton } from 'react-native-paper'
 import { useForm, Controller } from 'react-hook-form'
 import { ErrorMessage } from '@hookform/error-message'
 import Snackbar from 'react-native-snackbar'
@@ -71,9 +71,20 @@ const RightTab: FC<RightTabProps> = ({
     Snackbar.show(SNACKBAROPTIONS_SENT)
   }, [selectedTransactionId])
 
+  const returnToRightTab = useCallback(() => {
+    jumpTo('first')
+  }, [])
+
   console.log('render rightTab', errors)
   return (
     <View style={sty.tabContainer}>
+      <IconButton
+        icon={'arrow-left-bold-outline'}
+        style={sty.returnbutton}
+        size={25}
+        onPress={returnToRightTab}>
+        Back to transactions
+      </IconButton>
       {transactionEntry && (
         <View>
           <View style={sty.infoRow}>
@@ -101,7 +112,7 @@ const RightTab: FC<RightTabProps> = ({
               {new Date(transactionEntry.time).toLocaleString('uk-UA', {
                 timeZone: timeZoneCode,
               })}{' '}
-              {country} Time
+              {country} time
             </Text>
           </View>
 
@@ -166,7 +177,7 @@ export default React.memo(RightTab)
 const sty = StyleSheet.create({
   tabContainer: {
     flex: 1,
-    backgroundColor: '#C0C5C1',
+    backgroundColor: 'beige',
     padding: 15,
   },
   input: {
@@ -207,5 +218,11 @@ const sty = StyleSheet.create({
   },
   errorContainer: {
     height: 30,
+  },
+  returnbutton: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    padding: 0,
+    marginLeft: -4,
   },
 })

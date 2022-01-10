@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { FC, useCallback } from 'react'
 import {
   View,
   StyleSheet,
@@ -11,8 +11,9 @@ import Modal from 'react-native-modal'
 import { useAppSelector } from '../../hooks/appReduxHooks'
 import { RootState } from '../../redux/reducers'
 import { isEmpty } from 'lodash'
+import { IFxCurrenciesModalProps } from './types'
 
-const FxCurrenciesModal = ({
+const FxCurrenciesModal: FC<IFxCurrenciesModalProps> = ({
   visible = false,
   closeModal,
   onItemPicked,

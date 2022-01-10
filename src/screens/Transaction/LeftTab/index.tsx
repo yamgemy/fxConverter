@@ -1,6 +1,6 @@
 import React, { FC, useCallback } from 'react'
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { Surface, Text } from 'react-native-paper'
+import { Button, IconButton, Surface, Text } from 'react-native-paper'
 import { useAppSelector } from '../../../hooks/appReduxHooks'
 import { IaTransactionEntry } from '../../../redux/actions/payload-type'
 import { RootState } from '../../../redux/reducers'
@@ -29,12 +29,15 @@ const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransactionId }) => {
         <TouchableOpacity onPress={onTransactionEntryPressed(item)}>
           <Surface style={s.transactionEntryContainer}>
             <View style={s.valCurrency}>
-              <Text>{item.inputSend.val}</Text>
-              <Text>{item.inputSend.currency}</Text>
+              <Text style={s.valueText}>{item.inputSend.val}</Text>
+              <Text>{'  '}</Text>
+              <Text style={s.valueText}>{item.inputSend.currency}</Text>
             </View>
+            <IconButton icon={'arrow-right-bold-outline'} size={25} />
             <View style={s.valCurrency}>
-              <Text>{item.inputRecieve.val}</Text>
-              <Text>{item.inputRecieve.currency}</Text>
+              <Text style={s.valueText}>{item.inputRecieve.val}</Text>
+              <Text>{'  '}</Text>
+              <Text style={s.valueText}>{item.inputRecieve.currency}</Text>
             </View>
           </Surface>
         </TouchableOpacity>
@@ -45,11 +48,17 @@ const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransactionId }) => {
 
   return (
     <View style={s.tabContainer}>
-      <FlatList
-        data={transactionsList}
-        keyExtractor={(item: IaTransactionEntry) => item.time.toString()}
-        renderItem={renderTransactionItem}
-      />
+      {transactionsList && transactionsList.length > 0 ? (
+        <FlatList
+          data={transactionsList}
+          keyExtractor={(item: IaTransactionEntry) => item.time.toString()}
+          renderItem={renderTransactionItem}
+        />
+      ) : (
+        <View style={s.emptyListContainer}>
+          <Text style={s.emptyMessage}>No transactions created yet</Text>
+        </View>
+      )}
     </View>
   )
 }
@@ -57,11 +66,12 @@ const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransactionId }) => {
 export default React.memo(LeftTab)
 
 const s = StyleSheet.create({
-  tabContainer: { flex: 1, backgroundColor: '#ff4081' },
+  tabContainer: { flex: 1, backgroundColor: 'beige' },
   transactionEntryContainer: {
-    height: 50,
+    paddingHorizontal: 10,
+    height: 60,
     flexDirection: 'row',
-    backgroundColor: 'green',
+    backgroundColor: 'white',
     alignItems: 'center',
     margin: 5,
     elevation: 4,
@@ -69,5 +79,19 @@ const s = StyleSheet.create({
   valCurrency: {
     flexDirection: 'row',
     paddingHorizontal: 10,
+  },
+  emptyListContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    backgroundColor: 'beige',
+  },
+  emptyMessage: {
+    fontWeight: '500',
+    fontSize: 17,
+  },
+  valueText: {
+    fontWeight: '500',
+    fontSize: 15,
   },
 })

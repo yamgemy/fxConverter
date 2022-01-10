@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { useWindowDimensions } from 'react-native'
+import { useWindowDimensions, View } from 'react-native'
 import { TabView } from 'react-native-tab-view'
 import LeftTab from './LeftTab'
 import RightTab from './RightTab'
@@ -45,6 +45,7 @@ const TransactionScreen = () => {
       onIndexChange={setIndex}
       initialLayout={{ width: layout.width }}
       swipeEnabled={false}
+      renderTabBar={() => <View />}
     />
   )
 }

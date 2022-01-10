@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native'
 
 export const styles = StyleSheet.create({
   root: {
-    backgroundColor: '#C1C1C1',
+    backgroundColor: '#B4D1EB',
   },
   snackBarContainer: {
     marginTop: 200,
