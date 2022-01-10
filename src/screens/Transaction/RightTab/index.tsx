@@ -58,7 +58,7 @@ const RightTab: FC<RightTabProps> = ({
     setSelectedTransactionId('') //clear local state at TransactionScreen
     reset()
     Snackbar.show(SNACKBAROPTIONS_DELETE)
-  }, [])
+  }, [selectedTransactionId])
 
   const sendMoneyPressed = useCallback(() => {
     dispatch(
@@ -75,7 +75,6 @@ const RightTab: FC<RightTabProps> = ({
     jumpTo('first')
   }, [])
 
-  console.log('render rightTab', errors)
   return (
     <View style={sty.tabContainer}>
       <IconButton
