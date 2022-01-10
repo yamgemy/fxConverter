@@ -66,7 +66,7 @@ function* requestFxRatesWorker({ payload }: Action<IrequestFxRatesPayload>) {
     )
     yield put(actionLoadingFxRates(false))
   } catch (e) {
-    console.log('error at requestFxRatesWorker', e)
+    // console.log('error at requestFxRatesWorker', e)
   }
 }
 

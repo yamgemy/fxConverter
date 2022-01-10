@@ -33,7 +33,6 @@ export const converterReducer = handleActions<IFxState, any>(
       }
     },
     [FT.SET_CURRENCIES_PICKED]: (state, { payload }) => {
-      console.log('converterReducer1' + FT.SET_CURRENCIES_PICKED, payload)
       return {
         ...state,
         currenciesSelections: {

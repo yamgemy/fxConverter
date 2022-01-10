@@ -10,7 +10,6 @@ const x = ['inputSend', 'inputRecieve']
 const HookFormButton: FC<IHookFormButtonProps> = ({ form, onClick, label, disabled }) => {
   const { handleSubmit } = form
 
-  console.log('renderhookformbutton disabled ', disabled)
   return (
     <Button
       style={{

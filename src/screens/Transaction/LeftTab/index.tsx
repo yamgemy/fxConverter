@@ -24,7 +24,6 @@ const LeftTab: FC<LeftTabProps> = ({ jumpTo, setSelectedTransactionId }) => {
 
   const renderTransactionItem = useCallback(
     ({ item }) => {
-      console.log(item)
       return (
         <TouchableOpacity onPress={onTransactionEntryPressed(item)}>
           <Surface style={s.transactionEntryContainer}>

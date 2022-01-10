@@ -170,8 +170,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     }
   }, [currenciesSelections])
 
-  console.log('render converter & errors: ', errors)
-
   return (
     <View style={styles.root}>
       <CurrencyInputWithButton

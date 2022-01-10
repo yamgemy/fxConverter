@@ -25,8 +25,6 @@ const CurrencyInputWithButton: FC<CurrencyInputWithButtonProps> = ({
     getValues,
   } = form
 
-  console.log('renderInput', isLoading)
-
   return (
     <View style={style.outterContainer}>
       <View style={style.inputBtnContainer}>
