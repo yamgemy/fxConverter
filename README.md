@@ -1,9 +1,10 @@
 # fxConverter
 
-![ss1](https://i.postimg.cc/Mnz8pRrc/Screenshot-1641862360.png) ![ss4](https://i.postimg.cc/94n3bkXT/Screenshot-1641862445.png) ![ss2](https://i.postimg.cc/0zZ1MQLV/Screenshot-1641862375.png)
-![ss3](https://i.postimg.cc/f3LnxssD/Screenshot-1641862389.png) 
+![ss3](https://i.postimg.cc/ZRTTbk1f/Screenshot-1641862445.png)![ss5](https://i.postimg.cc/50KvMm6R/Screenshot-1641864855.png)
+![ss4](https://i.postimg.cc/g0bz7L4b/Screenshot-1641862375.png)![ss2](https://i.postimg.cc/8CdpgknJ/Screenshot-1641862389.png)
 
-fxConverter, where fx stands for foreign exchange, provides the function of currency conversion based on conversion rates retrieved from a [free public API](https://freecurrencyapi.net/), and currencies' names from [another](https://openexchangerates.org/api/currencies.json) . As an exposition to maneuvering with data handling in a React environment, the app also comes with data listing, update and delete. 
+
+fxConverter, where fx stands for foreign exchange, provides the function of currency conversion based on conversion rates retrieved from a [free public API](https://freecurrencyapi.net/), and currencies' names from [another](https://openexchangerates.org/api/currencies.json). As an exposition to maneuvering with data handling in a React environment, the app also comes with data listing, update and delete. Evidently, aethestics are not within scope, things are laid out so long as they are not so hideous that could not be interacted with, without acquiring cancer.
 
 fxConverter is my second attempt at using Typescript in React Native extensively, but the first serious attempt in doing so, at least wherever applicable. Secondarily i aim to demonstrate deeper but arguably fundamental concerns on React Native frontend development such as normalization of data structure in the Redux store, considerations made in the process of render optimizations and the choice between adopting React-Query or adhering to the traditional way of request data into a centralized data store. To the experienced viewers of this repository, you will probably find instances where implementations were questionable and imperfect. But at this point i will lay out what've i got and address the above issues raised. 
 
@@ -28,3 +29,9 @@ Thanks to a recent share on LinkedIn, i borrowed a method of passing parameters 
 ## useState 101
 
 An instance of me returning to a total noob. I have a local state [selectedCurrencyButton, setSelectedCurrencyButton] = useState('someString') in my converter component. It is used for remembering where the user clicked the currency button from, and this state is then used for updating the currencies selections in the Redux store. As it turned out, the latest state of this variable was incorrectly read upon the time of the second part as described above. I spent a good amount of time trying to add/remove/add again useCallback, but nothing worked. Then i circumventing the problem by directly passing this value through callbacks, just to get the code to read the fresh values. Voila, that worked. I wondered why, and suspected that it may be because setSelectedCurrencyButton didn't quite trigger rerender when selectedCurrencyButton wasn't used in the returning view, which now is. This proved to be not the case, as i did a quick check with React sandbox. Even when the state variable wasn't a part of the returning view, the component still re-runs when a change to this state value is invoked. I still haven't pinpointed on the exact cause of this peculiarity (as i call it, probably not to the experienced React guru). Because of the complexity of the component (the interconnections among callbacks within, and the stuff they do from child components), I simply went around it as described above. Perhaps in another instance of implementation, this serves as a critical reminder on what might occur, arising from what ought to be regarded as bread and butter aspect of React.
+
+## Running the app
+
+App developed using react native (not expo) and android emulator only.
+
+Assuming you have react native and [stuff](https://reactnative.dev/docs/environment-setup) set up already, in root folder run command `yarn` then `npm run android`
