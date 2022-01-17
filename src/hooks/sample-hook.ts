@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 export const useSampleHook = () => {
   const [sample, setSample] = useState(false)

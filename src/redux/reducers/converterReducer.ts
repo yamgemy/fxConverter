@@ -29,7 +29,7 @@ export const converterReducer = handleActions<IFxState, any>(
           ...state.fxRatesData,
           [payload.baseCurrency]: payload.fxData,
         },
-        baseCurrency: payload.baseCurrency, //TODO: remove it as it duplicates state
+        baseCurrency: payload.baseCurrency,
       }
     },
     [FT.SET_CURRENCIES_PICKED]: (state, { payload }) => {

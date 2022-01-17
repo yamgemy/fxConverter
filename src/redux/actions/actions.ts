@@ -10,14 +10,14 @@ import {
   fxDataEntry,
   IaCurrencyPicked,
   IaTransactionEntry,
-  IdontTransactionPayload,
+  IdoneTransactionPayload,
   IremoveTransactionPayload,
   IrequestFxRatesPayload,
   IresponseCurrenciesNamesPayload,
   IresponseFxRatesPayload,
 } from './payload-type'
 
-//usage example: setAppLoading(true)
+//usage example: dispatch(setAppLoading(true))
 export const actionSetAppLoading = createAction<boolean>(GT.SET_APP_LOADING)
 
 export const actionLoadingFxRates = createAction<boolean>(FT.LOADING_FX_RATES)
@@ -30,12 +30,12 @@ export const actionOnFxRatesRequested = createAction<
   IresponseFxRatesPayload<fxDataEntry>
 >(FT.ONSUCCESS_FX_RATES)
 
-//this action leads to reuesting fxRates inside requestFxDataSaga.ts
+//this action leads to requesting fxRates inside requestFxDataSaga.ts
 export const actionOnCurrenciesPicked = createAction<IaCurrencyPicked>(
   FT.ON_CURRENCIES_PICKED,
 )
 
-//this action simple sets picked currencies state into store
+//this action simply sets picked currencies state into store
 export const actionSetCurrenciesPicked = createAction<IaCurrencyPicked>(
   FT.SET_CURRENCIES_PICKED,
 )
@@ -56,6 +56,6 @@ export const actionRemoveTransactionEntry = createAction<IremoveTransactionPaylo
 )
 
 //not currently through saga
-export const actionSetBankTransactionEntry = createAction<IdontTransactionPayload>(
+export const actionSetBankTransactionEntry = createAction<IdoneTransactionPayload>(
   TT.DONE_TRANSACTION_ENTRY,
 )

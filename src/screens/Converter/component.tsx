@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useState, useEffect } from 'react'
+import React, { FC, useCallback, useState, useEffect, useRef } from 'react'
 import { View } from 'react-native'
 import { useForm } from 'react-hook-form'
 import { styles } from './styles'
@@ -23,7 +23,7 @@ import { IaTransactionEntry } from '../../redux/actions/payload-type'
 const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) => {
   const dispatch = useAppDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedCurrencyButton, setSelectedCurrencyButton] = useState(INPUTSEND)
+  const selectedCurrencyButton = useRef(INPUTSEND) //replaced from useState as it's not part of render
 
   const { isLoadingFx, currenciesSelections } = useAppSelector(
     (state: RootState) => state.converterReducer,
@@ -50,7 +50,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   const {
     setValue,
     getValues,
-    clearErrors,
+    clearErrors, //initially intended to use on kystrokes, but causes rerenders; currently use 'reValidateMode' and 'shouldValidate' instead
     reset,
     formState: { errors, isDirty },
   } = form
@@ -88,18 +88,19 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
   }, [])
 
   //usecallback because it's passed to children
-  const currencyBtnPressed = useCallback(
-    (inputName) =>
-      debounce((): void => {
-        toggleModal(true)()
-        setSelectedCurrencyButton(inputName)
-      }, 300),
-    [],
-  )
+  const currencyBtnPressed = useCallback((inputName) => {
+    //selectedCurrencyButton.current = inputName //putting it here DOES NOT WORK;
+    //children will only invoke what's inside the returning function
+    return debounce((): void => {
+      selectedCurrencyButton.current = inputName
+      toggleModal(true)()
+    }, 300)
+  }, []) //putting selectedCurrencyButton as dependency wont't affect recreating the function since, as a ref, it remains the same throughout renders;
+  //putting selectedCurrencyButton.current does not matter as we are not reading from it but will overwrite the current value anyway
 
   //usecallback because it's passed to children
   const onItemPicked = useCallback((item, fromInputName) => {
-    return debounce(() => {
+    return debounce((): void => {
       dispatch(
         //this dispatch leads to request fxRate if currency picked at inputSend
         actionOnCurrenciesPicked({
@@ -120,16 +121,15 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         [key]: { val: enteredValues[key], currency: currenciesSelections[key] },
       }),
       {
-        inputSend: {},
-        inputRecieve: {},
+        // inputSend: {}, //.reduce is adding exactly this property. Made optional in IaTransactionEntry interface
+        // inputRecieve: {}, //.reduce is adding exactly this property. Made optional in IaTransactionEntry interface
         time: new Date().getTime(),
         done: false,
-        recipientBank: '',
+        //recipientBank: '', //rightfully optional; it's not part of the payload here
       },
     )
     dispatch(actionSubmitTransactionEntry(transactionEntry))
     Snackbar.show(SNACKBAROPTIONS)
-    // toggleSnackbar(true)()
   }, [getValues, currenciesSelections])
 
   //usecallback because it's passed to children
@@ -137,7 +137,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
     (fieldName) => {
       return (e: React.ChangeEvent<HTMLInputElement>): void => {
         changeTargetInputValue(fieldName, e.target.value)
-        //TODO: clear errors on the other input
       }
     },
     [currenciesSelections, fxRatesData, errors],
@@ -150,17 +149,23 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
 
   //0. this useEffect invokes on 2 cases.
   //1. after the initial actionRequestFxRates dispatch and fxData updated,
-  //2. after currenciesSelections changed AND ONLY if it's from inputSend, actionRequestFxRates is also invoked
+  //2. after currenciesSelections changed AND ONLY if it's from inputSend, actionRequestFxRates is also invoked from saga
   useEffect(() => {
     if (!isEmpty(fxRatesData)) {
-      changeTargetInputValue(selectedCurrencyButton, getValues(selectedCurrencyButton))
+      changeTargetInputValue(
+        selectedCurrencyButton.current,
+        getValues(selectedCurrencyButton.current),
+      )
     }
   }, [fxRatesData])
 
   //picking currency at inputRecieve DOES NOT request fxRatesData, change inputSend value immediately
   useEffect(() => {
-    if (selectedCurrencyButton === INPUTRECIEVE) {
-      changeTargetInputValue(selectedCurrencyButton, getValues(selectedCurrencyButton))
+    if (selectedCurrencyButton.current === INPUTRECIEVE) {
+      changeTargetInputValue(
+        selectedCurrencyButton.current,
+        getValues(selectedCurrencyButton.current),
+      )
     }
   }, [currenciesSelections])
 
@@ -195,7 +200,7 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         visible={isModalOpen}
         isLoadingFx={isLoadingFx}
         closeModal={toggleModal(false)}
-        selectedCurrencyButton={selectedCurrencyButton}
+        selectedCurrencyButton={selectedCurrencyButton.current}
         currenciesList={!isEmpty(fxRatesData) && Object.keys(fxRatesData)}
         onItemPicked={onItemPicked}
       />
