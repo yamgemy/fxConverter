@@ -1,5 +1,4 @@
 import { combineReducers, Reducer } from 'redux'
-import { Action } from 'redux-actions'
 import { applicationReducer } from './applicationReducer'
 import { converterReducer } from './converterReducer'
 import { currenciesNamesReducer } from './currenciesNamesReducer'
@@ -12,7 +11,7 @@ import {
 import { transactionsReducer } from './transactionsReducer'
 // export const initialState = {
 //   //this property shouldn't be named as applicationReducer,
-//   //because you are specifically referring to the state inside of it, which is appLoading
+//   //because it specifically refers to the state inside of it, which is appLoading
 //   //also i don't really want to duplicate declaration to the same value
 //   applicationReducer: applicationReducer.initialState,
 // }
@@ -27,8 +26,7 @@ import { transactionsReducer } from './transactionsReducer'
 // }
 
 export interface IAllReducersStates {
-  //renamed from InitialState
-  applicationReducer: IApplicationState
+  applicationReducer: IApplicationState //renamed from 'InitialState'
   converterReducer: IFxState
   transactionsReducer: ITransactionsState
   currenciesNamesReducer: ICurrenciesNamesState

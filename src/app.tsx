@@ -7,7 +7,7 @@ import { getConfiguredStore } from './redux/store'
 import { RNPaperTheme } from './constants'
 import BottomTabNavigator from './navigators/BottomTabNavigator'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient() //not currently used
 
 export const { store, persistor } = getConfiguredStore()
 

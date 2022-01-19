@@ -8,7 +8,7 @@ import {
   fork,
   takeEvery,
 } from 'redux-saga/effects'
-import { Action, createAction } from 'redux-actions'
+import { Action } from 'redux-actions'
 import { FX_TYPES as FT } from '../actions/action-types'
 import {
   requestFxRates, //used by useQuery
@@ -30,7 +30,7 @@ import { TIME_LAST_BASECURRENCY_EXPIRES } from '../../constants'
 
 function* currenciesSelectionsWorker({ payload }: Action<IaCurrencyPicked>) {
   const { targetInput, targetCurrency } = payload
-  //debounce didn't work :(
+  //debounce didn't seem to work :(
   const { currenciesSelections } = yield select((state) => state.converterReducer)
   if (currenciesSelections[targetInput] !== targetCurrency) {
     yield put(actionSetCurrenciesPicked(payload))

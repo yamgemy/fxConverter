@@ -10,15 +10,14 @@ import { rootReducer } from '../reducers'
 const persistConfig = {
   key: 'fxConverterPersistConfig',
   storage: AsyncStorage,
-  blacklist: ['converterReducer', 'transactionsReducer'],
+  blacklist: ['converterReducer', 'transactionsReducer'], //blaklist while in development
 }
 
-//renamed from configureStoe
+//renamed from configureStore
 export const getConfiguredStore = () => {
   //const composeEnhancers = composeWithDevTools({}) //redundant
   const persistedReducer = persistReducer(persistConfig, rootReducer)
-  //I havent used preloadedState in my last project
-  //but instead when persist rehydrates from previously persisted state, that's like a preloadedState
+  //instead of preloadedState, use persist rehydrates from previously persisted state, that's like a preloadedState
   const store = createStore(persistedReducer, composeWithDevTools(middleware))
   const persistor = persistStore(store)
   sagaMiddleware.run(rootSagasWatcher)

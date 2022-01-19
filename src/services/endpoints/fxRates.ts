@@ -4,8 +4,10 @@ import {
   CONVERTOR_APIKEY,
   CURRENCIES_NAMES_URL,
 } from '../../constants'
+
 const axiosInstance: AxiosInstance = axios.create({ timeout: 5000 })
 
+//not currently used. Created for react-query
 export const requestFxRates: Function = (baseCurreny: string = 'USD') => {
   return async () => {
     const config: AxiosRequestConfig = {

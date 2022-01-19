@@ -1,13 +1,4 @@
-import {
-  takeLatest,
-  call,
-  put,
-  take,
-  putResolve,
-  select,
-  fork,
-  takeEvery,
-} from 'redux-saga/effects'
+import { takeLatest, call, put } from 'redux-saga/effects'
 import { CURRENCYNAMES_TYPES as CT } from '../actions/action-types'
 import { getRequestCurrenciesNamesPromise } from '../../services/endpoints/fxRates'
 import { actionSetCurrenciesNames } from '../actions/actions'
