@@ -30,6 +30,7 @@ const FxCurrenciesModal: FC<IFxCurrenciesModalProps> = ({
     [selectedCurrencyButton, onItemPicked],
   )
 
+  //TODO: memorize?
   const renderCurrencyItem = ({ item }) => {
     return (
       <TouchableOpacity
@@ -42,21 +43,11 @@ const FxCurrenciesModal: FC<IFxCurrenciesModalProps> = ({
     )
   }
 
-  // const renderCurrencyItem = React.useMemo(() => {
-  //   return ({ item }) => (
-  //     <TouchableOpacity
-  //       disabled={isLoadingFx}
-  //       onPress={onCurrencyPressed(item)}
-  //       style={sty.currencyItem}>
-  //       <Text style={sty.abbrev}>{item}</Text>
-  //       {currenciesNames[item] && <Text>{currenciesNames[item]}</Text>}
-  //     </TouchableOpacity>
-  //   )
-  // }, [currenciesNames])
-
+  //TODO: memorize?
   const renderSeparator = () => {
     return <View style={sty.separator}></View>
   }
+
   return (
     <View style={sty.container}>
       <Modal

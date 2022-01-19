@@ -195,7 +195,6 @@ const ConverterScreen: FC<InitialSampleScreenProps> = ({ navigation, route }) =>
         label={'Create Transaction'}
         disabled={!isEmpty(errors) || !isDirty}
       />
-
       <FxCurrenciesModal
         visible={isModalOpen}
         isLoadingFx={isLoadingFx}
